@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Details | Langy</title>
+</head>
+<body>
+
+<h1>{{ book.title }}</h1>
+<h2>By {{ book.author }}</h2>
+<br>
+
+<p>
+    <a href="{% url 'read:read' book.id %}">Read this book!</a>
+</p>
+<br/>
+
+<p>
+    <h3>Summary:</h3>
+    {{ book.summary }}
+</p>
+
+</body>
+</html>

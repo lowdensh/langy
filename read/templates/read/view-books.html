@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Books | Langy</title>
+</head>
+<body>
+
+<h1>My Books</h1>
+<ul>
+{% for book in book_list %}
+    <li><a href="{% url 'read:details' book.id %}">{{ book.title }}</a></li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
