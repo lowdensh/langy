@@ -21,8 +21,14 @@
 
 <main>
 
+    {% for paragraph in paragraph_list %}
+        <p>{{ paragraph }}</p>
+    {% endfor %}
+
     <p>
-        book text... looootsa book text here
+        {% for word in word_list %}
+            {{ word.english_word }},
+        {% endfor %}
     </p>
 
 </main>

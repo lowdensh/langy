@@ -1,22 +1,24 @@
 # https://docs.djangoproject.com/en/3.1/topics/db/models/
 # https://docs.djangoproject.com/en/3.1/ref/models/fields/
-# Allow empty strings (CharField etc.), not NULL, according to Django convention
+# Allow empty strings (CharField etc.) but not NULL i.e. blank=True
 
 from django.db import models
 
 
 class Author(models.Model):
     first_name = models.CharField(max_length=50)
+    other_names = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50)
-    website = models.URLField(blank=True)
 
     class Meta:
         ordering = ['last_name', 'first_name']
 
     def __str__(self):
-        if len(self.first_name) == 1:
-            return f'{self.first_name}. {self.last_name}'
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.last_name}, {self.first_name} {self.other_names}'
+
+    def western_order(self):
+        return f'{self.first_name} {self.other_names} {self.last_name}'
+
 
 
 class Category(models.Model):
@@ -44,6 +46,7 @@ class TranslatableWord(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
+    website = models.URLField()
     summary = models.TextField(max_length=1000, blank=True)
     pub_date = models.DateField('Date Published', blank=True, null=True)
     publisher = models.CharField(max_length=100, blank=True)

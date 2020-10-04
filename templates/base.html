@@ -1,13 +1,18 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>{% block title %}Langy{% endblock %}</title>
     <meta charset="UTF-8">
-    <title>Langy</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
+    {% block styles %}{% endblock %}
 </head>
 <body>
+
+{% block body_content %}{% endblock %}
 
 </body>
 </html>

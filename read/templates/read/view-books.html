@@ -1,17 +1,30 @@
+{% extends "base.html" %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>{% block title %}My Books | Langy{% endblock %}</title>
     <meta charset="UTF-8">
-    <title>My Books | Langy</title>
 </head>
 <body>
+{% block body_content %}
 
-<h1>My Books</h1>
-<ul>
-{% for book in book_list %}
-    <li><a href="{% url 'read:details' book.id %}">{{ book.title }}</a></li>
-{% endfor %}
-</ul>
+<header>
+    <h1>My Books</h1>
+</header>
 
+<main>
+
+    <p>
+        <ul>
+        {% for book in book_list %}
+            <li><h2><a href="{% url 'read:details' book.id %}">{{ book.title }}</a></h2></li>
+        {% endfor %}
+        </ul>
+    </p>
+
+</main>
+
+{% endblock %}
 </body>
 </html>

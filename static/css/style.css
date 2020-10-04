@@ -1,3 +1,38 @@
-body {
-  background-color: rgb(226,239,217);
+html {
+    background-color: #f2f6ed;
+    font-family: "Open Sans", "Lucida Sans Unicode", sans-serif;
+    letter-spacing: 0.05em;
+    text-align: justify;
+}
+
+header {
+    background-color: #c4dab4;
+    border-bottom: 3px solid #748e63;
+    position: fixed;
+    z-index: 10;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    text-align: left;
+    padding: 0;
+    padding-left: 20px;
+}
+
+main {
+    width: 75%;
+    margin: 0 auto;
+    margin-top: 150px;
+    margin-bottom: 70px;
+}
+
+header h1 {
+    font-size: 1.5em;
+}
+
+header h2 {
+    font-size: 1em;
+}
+
+a, a:visited {
+    color: #748e63;
 }
