@@ -22,12 +22,12 @@
 <main>
 
     {% for paragraph in paragraph_list %}
-        <p>{{ paragraph }}</p>
+        <p>{{ paragraph | safe }}</p>
     {% endfor %}
 
     <p>
         {% for word in word_list %}
-            {{ word.english_word }},
+            '{{ word }}',
         {% endfor %}
     </p>
 
