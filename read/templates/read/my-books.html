@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}My Books | Langy{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mb-5">
+
+    <div class="row mt-5 justify-content-center">
+        {% for book in book_list %}
+        <div class="col-8 text-center">
+            <h1 class="mb-3"><a href="{% url 'read:book_details' book.id %}">{{ book.title }}</a></h1>
+        </div>
+        {% endfor %}
+    </div>
+    
+</div>
+
+{% endblock %}

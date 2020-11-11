@@ -1,18 +1,12 @@
 {% extends "base.html" %}
+{% block title %}{{ book.title }} | Langy{% endblock %}
 {% load static %}
-{% block styles %}
+{% block extrahead %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/read.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mali">
 {% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>{% block title %}{{ book.title }} | Langy{% endblock %}</title>
-    <meta charset="UTF-8">
-</head>
-<body>
-{% block body_content %}
+{% block content %}
 
 <header>
     <h1>{{ book.title }}</h1>
@@ -34,5 +28,3 @@
 </main>
 
 {% endblock %}
-</body>
-</html>

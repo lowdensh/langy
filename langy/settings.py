@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import environ
+from . import views
 from pathlib import Path
+import environ
+import os
 
 
 env = environ.Env(
@@ -20,6 +22,7 @@ env = environ.Env(
 )
 # reading .env file
 environ.Env.read_env()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,8 +50,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'read.apps.ReadConfig',
+    # My apps
+    'users',
+    'language',
+    'read',
+
+    # Other apps
+    'crispy_forms',
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -108,6 +121,8 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -146,3 +161,13 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
     BASE_DIR / 'read/static/read',
 ]
+
+# Uploaded files
+# https://docs.djangoproject.com/en/3.1/topics/files/
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+
+# Redirect to URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = views.empty_redirect

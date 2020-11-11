@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Logged Out | Langy{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+
+    <!-- Logo -->
+    <div class="row mt-5 justify-content-center">
+        <div class="col-lg-5 text-center">
+            <img src="{% static 'images/langy.svg' %}" width="80%">
+        </div>
+    </div>
+
+    <div class="row mt-5 justify-content-center">
+        <div class="col-lg-5 text-center">
+            <p>You have been logged out.</p>
+        </div>
+    </div>
+
+    <!-- Text links -->
+    <div class="row mt-5 justify-content-center">
+        <div class="group col-lg-5 text-center">
+            <p><a href="{% url 'login' %}">Return to login</a></p>
+        </div>
+    </div>
+
+</div>
+  
+{% endblock %}

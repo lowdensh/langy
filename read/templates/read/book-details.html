@@ -1,10 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ book.title }} | Langy{% endblock %}
-{% load static %}
-{% block extrahead %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/read.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mali">
-{% endblock %}
+{% block title %}Book Details | Langy{% endblock %}
 
 {% block content %}
 
@@ -23,9 +18,16 @@
     </div>
 
     <div class="row mt-5 justify-content-center">
-        <p>
-            book text... looootsa book text here
-        </p>
+        <div class="col text-center">
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:my_books' %}" role="button">Back</a>
+            <a class="btn btn-success btn-lg ml-3" href="{% url 'read:read' book.id %}" role="button">Read!</a>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col text-justify">
+            <h3>Summary:</h3>{{ book.summary }}
+        </div>
     </div>
 
 </div>

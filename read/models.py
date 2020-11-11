@@ -16,31 +16,9 @@ class Author(models.Model):
     def __str__(self):
         return f'{self.last_name}, {self.first_name} {self.other_names}'
 
-    def western_order(self):
+    @property
+    def full_name(self):
         return f'{self.first_name} {self.other_names} {self.last_name}'
-
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    class Meta:
-        ordering = ['name']
-        verbose_name_plural = 'Categories'
-
-    def __str__(self):
-        return self.name
-
-
-class TranslatableWord(models.Model):
-    english_word = models.CharField(max_length=50, unique=True)
-    categories = models.ManyToManyField(Category)
-
-    class Meta:
-        ordering = ['english_word']
-
-    def __str__(self):
-        return self.english_word
 
 
 class Book(models.Model):
@@ -48,7 +26,7 @@ class Book(models.Model):
     author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
     website = models.URLField()
     summary = models.TextField(max_length=1000, blank=True)
-    pub_date = models.DateField('Date Published', blank=True, null=True)
+    pub_date = models.DateField(verbose_name='Date Published', blank=True, null=True)
     publisher = models.CharField(max_length=100, blank=True)
     isbn = models.CharField('ISBN', max_length=13, blank=True, help_text=(
         'A 10 or 13 character <a href="https://www.isbn-international.org/content/what-isbn">ISBN</a>. '

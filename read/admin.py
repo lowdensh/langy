@@ -1,9 +1,5 @@
+from .models import Author, Book
 from django.contrib import admin
 
-from .models import Author, Category, TranslatableWord, Book
 
-
-admin.site.register(Author)
-admin.site.register(Category)
-admin.site.register(TranslatableWord)
-admin.site.register(Book)
+admin.site.register([Author, Book])
