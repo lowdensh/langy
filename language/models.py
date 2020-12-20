@@ -15,8 +15,8 @@ class ForeignLanguage(models.Model):
         help_text=('The amount of learners this language course has on Duolingo. See <a '
             'href="https://www.duolingo.com/courses">Duolingo Courses</a>.')
     )
-    flag_flat = models.ImageField(upload_to='flags/flat')
-    flag_button = models.ImageField(upload_to='flags/button')
+    flag_flat = models.ImageField(upload_to='language_flags/flat')
+    flag_button = models.ImageField(upload_to='language_flags/button')
 
     class Meta:
         ordering = ['english_name']
