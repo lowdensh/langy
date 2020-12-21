@@ -11,9 +11,9 @@ class CustomUserAdmin(UserAdmin):
     model = CustomUser
 
     # Main list
-    list_display = ('is_superuser', 'email', 'display_name', 'date_joined', 'last_login', 'is_active',)
+    list_display = ('is_superuser', 'email', 'display_name', 'last_login', 'is_active',)
     list_display_links = ('email', 'display_name',)
-    list_filter = ('is_active',)
+    list_filter = ('is_superuser',)
     search_fields = ('email', 'display_name',)
     ordering = ('-is_superuser', 'email')
 

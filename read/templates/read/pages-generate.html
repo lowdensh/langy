@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Generate Pages | Langy{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <div class="row mt-5 justify-content-center">
+        <div class="col-8 text-center">
+            <h1>{{ book.title }}</h1>
+            <h2>By {{ book.author.full_name }}</h2>
+        </div>
+    </div>
+
+    <div class="row mt-5 justify-content-center">
+        <div class="col text-center">
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">Back</a>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col text-justify">
+            Using PDF: <a href="{{ book.pdf.url }}" target="_blank">{{ book.pdf.name }}</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

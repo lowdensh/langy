@@ -1,12 +1,9 @@
 # General
-.idea
-.vscode
+.idea/
+.vscode/
 .env
 
 # Django
 db.sqlite3
 __pycache__/
 *.pyc
-
-# My project
-static/books

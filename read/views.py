@@ -1,6 +1,9 @@
+from .forms import BookPDFForm
 from .models import Book
 from language.models import TranslatableWord
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from googletrans import Translator
 import re
@@ -16,14 +19,63 @@ def my_books(request):
 
 
 @login_required
-def book_details(request, book_id):
-    template = 'read/book-details.html'
+def details(request, book_id):
+    template = 'read/details.html'
     book = get_object_or_404(Book, pk=book_id)
     context = {
-        'book': book,
-        'author_name': book.author.full_name
+        'book': book
     }
     return render(request, template, context)
+
+
+@login_required
+@staff_member_required
+def pages_manage(request, book_id):
+    template = 'read/pages-manage.html'
+    book = get_object_or_404(Book, pk=book_id)
+    form = BookPDFForm(instance=book)
+    context = {
+        'book': book,
+        'form':  form
+    }
+    return render(request, template, context)
+
+
+@login_required
+@staff_member_required
+def pages_generate(request, book_id):
+    template = 'read/pages-generate.html'
+    book = get_object_or_404(Book, pk=book_id)
+    form = BookPDFForm(instance=book) 
+    context = {
+        'book': book,
+        'form':  form
+    }
+    return render(request, template, context)
+
+
+@login_required
+@staff_member_required
+def pages_upload_pdf(request, book_id):
+    try:
+        template = 'read/pages-manage.html'
+        book = get_object_or_404(Book, pk=book_id)
+
+        if request.method == 'POST':
+            form = BookPDFForm(request.POST, request.FILES, instance=book)
+            book.pdf.delete()
+            if form.is_valid():
+                form.save()
+
+        form = BookPDFForm(instance=book)  
+        context = {
+            'book': book,
+            'form':  form
+        }
+        return render(request, template, context)
+
+    except Exception:
+        return HttpResponseBadRequest('Bad request')
 
 
 # wip read functionality

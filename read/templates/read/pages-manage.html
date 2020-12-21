@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Manage Pages | Langy{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <div class="row mt-5 justify-content-center">
+        <div class="col-8 text-center">
+            <h1>{{ book.title }}</h1>
+            <h2>By {{ book.author.full_name }}</h2>
+        </div>
+    </div>
+
+    <div class="row mt-5 justify-content-center">
+        <div class="col text-center">
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:details' book.id %}" role="button">Back</a>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col text-justify">
+            <h3>Upload PDF</h3>
+            {% if book.has_pdf %}
+                <p>Uploading a new PDF will permanently delete and replace the existing one.</p>
+            {% endif %}
+            <form method="POST" action="{% url 'read:pages_upload_pdf' book.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.pdf }}
+                <br>
+                <input type="submit" value="Upload" class="btn btn-success btn-lg mt-3">
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col text-justify">
+            <h3>Generate Pages</h3>
+            {% if book.has_pdf %}
+                This book has a PDF to generate pages from. You can edit these before saving.
+                {% if book.has_pages %}
+                    Saving new pages will replace the existing ones.
+                {% endif %}
+                <br>
+                <a class="btn btn-success btn-lg mt-3" href="{% url 'read:pages_generate' book.id %}" role="button">Generate</a>
+            {% else %}
+                This book does not have a PDF to generate pages from.
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col text-justify">
+            <h3>Edit Pages</h3>
+            {% if book.has_pages %}
+                This book has {{ book.page_count }} existing pages. These can be edited on the administration website.
+            {% else %}
+                This book does not have any existing pages.
+            {% endif %}
+            <br>
+            <a class="btn btn-secondary btn-lg mt-3" href="{% url 'admin:read_book_change' book.id %}" role="button" target="_blank">View book on admin site</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

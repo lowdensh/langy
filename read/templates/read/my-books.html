@@ -9,7 +9,7 @@
     <div class="row mt-5 justify-content-center">
         {% for book in book_list %}
         <div class="col-8 text-center">
-            <h1 class="mb-3"><a href="{% url 'read:book_details' book.id %}">{{ book.title }}</a></h1>
+            <h1 class="mb-3"><a href="{% url 'read:details' book.id %}">{{ book.title }}</a></h1>
         </div>
         {% endfor %}
     </div>

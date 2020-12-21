@@ -2,7 +2,7 @@ from users.admin import CustomUserCreationForm
 from .models import CustomUser
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 
 def sign_up(request):
@@ -18,7 +18,7 @@ def sign_up(request):
             password = form.cleaned_data.get('password1')
             user = authenticate(email=email, password=password)
             login(request, user)
-            return redirect('langy:empty_redirect')
+            return redirect('read:my_books')
     # Otherwise, just display the form
     # This prevents error messages displaying on first form load where the user hasn't submitted anything yet
     else:

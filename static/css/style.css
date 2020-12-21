@@ -13,7 +13,10 @@ a:hover {
     color: #218838;
     text-decoration: none;
 }
-input {
+input[type=text],
+input[type=text]:focus,
+input[type=password],
+input[type=password]:focus {
     text-align: center;
     background-color: #F2F6ED;
 }
