@@ -1,12 +1,12 @@
 from .forms import BookPDFForm
-from .models import Book
+from .models import Book, Page
 from language.models import TranslatableWord
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from googletrans import Translator
-import re
+import json, pdfplumber, re
 
 
 @login_required
@@ -43,19 +43,6 @@ def pages_manage(request, book_id):
 
 @login_required
 @staff_member_required
-def pages_generate(request, book_id):
-    template = 'read/pages-generate.html'
-    book = get_object_or_404(Book, pk=book_id)
-    form = BookPDFForm(instance=book) 
-    context = {
-        'book': book,
-        'form':  form
-    }
-    return render(request, template, context)
-
-
-@login_required
-@staff_member_required
 def pages_upload_pdf(request, book_id):
     try:
         template = 'read/pages-manage.html'
@@ -70,13 +57,61 @@ def pages_upload_pdf(request, book_id):
         form = BookPDFForm(instance=book)  
         context = {
             'book': book,
-            'form':  form
+            'form': form
         }
         return render(request, template, context)
 
     except Exception:
         return HttpResponseBadRequest('Bad request')
 
+
+@login_required
+@staff_member_required
+def pages_generate(request, book_id):
+    template = 'read/pages-generate.html'
+    book = get_object_or_404(Book, pk=book_id)
+    if book.has_pdf:
+        text_content = []
+        with pdfplumber.open(book.pdf) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text()
+                text = text.replace('\n', ' ')
+                text = text.replace('  ', ' ')
+                text_content.append(text)
+    else:
+        text_content = None
+
+    context = {
+        'book': book,
+        'text_content': text_content
+    }
+    return render(request, template, context)
+
+
+@login_required
+@staff_member_required
+def pages_save(request, book_id):
+    try:
+        if request.method == 'POST':
+            book = get_object_or_404(Book, pk=book_id)
+            json_data = json.loads(request.body)
+            text_content = json_data['text_content']
+
+            # Delete existing pages
+            Page.objects.filter(book__id=book_id).delete()
+
+            # Create new pages
+            for i, text in enumerate(text_content, 1):
+                Page.objects.create(
+                    book = book,
+                    number = i,
+                    text = text
+                )
+                
+            return JsonResponse({'success': True})
+
+    except Exception:
+        return HttpResponseBadRequest('Bad request')
 
 # wip read functionality
 @login_required

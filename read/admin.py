@@ -11,7 +11,14 @@ class AuthorAdmin(admin.ModelAdmin):
     ordering = ('surname', 'forename', 'middle_names',)
 
 
-admin.site.register(Page)
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    # Main list
+    list_display = ('book', 'number', 'text_snippet',)
+    list_display_links = ('text_snippet',)
+    list_filter = ('book__title',)
+    search_fields = ('book', 'text_snippet')
+    ordering = ('book', 'number',)
 
 
 class PageInline(admin.TabularInline):

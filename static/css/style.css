@@ -1,18 +1,30 @@
 
-/* LAYOUT */
+/* COLORS */
+/* https://coolors.co/f2f6ed-c4dab4-748e63-103409-638d2b-218838-ed7931 */
+
+a {
+    color: #748e63;
+}
+
+a:hover {
+    color: #218838;
+    text-decoration: none;
+}
+
+.btn-success {
+    background-color: #638d2b;
+    border-color: #638d2b;
+}
+
+.bg-forest {
+    background-color: #103409;
+}
+
 .container {
     font-size: 1.3em;
     letter-spacing: 0.05em;
 }
 
-/* ELEMENTS */
-a {
-    color: #748e63;
-}
-a:hover {
-    color: #218838;
-    text-decoration: none;
-}
 input[type=text],
 input[type=text]:focus,
 input[type=password],
@@ -21,50 +33,11 @@ input[type=password]:focus {
     background-color: #F2F6ED;
 }
 
-/* COLORS */
-.btn-success {
-    background-color: #638d2b;
-    border-color: #638d2b;
+textarea {
+    resize: none;
 }
-.color-green-white {
-    color: #F2F6ED;  /* ivory */
-}
-.color-green-light {
-    color: #C4DAB4;  /* tea green */
-}
-.color-green-med {
-    color: #748E63;  /* russian green */
-}
-.color-green-dark {
-    color: #103409;  /* forest green traditional */
-}
-.color-green-success {
-    color: #638d2b;  /* maximum green */
-}
-.color-green-suchov {
-    color: #218838;  /* forest green web */
-}
-.color-orange {
-    color: #ED7931;  /* pumpkin */
-}
-.bg-green-white {
+
+textarea.form-control,
+textarea.form-control:focus {
     background-color: #F2F6ED;
-}
-.bg-green-light {
-    background-color: #C4DAB4;
-}
-.bg-green-med {
-    background-color: #748E63;
-}
-.bg-green-dark {
-    background-color: #103409;
-}
-.bg-green-success {
-    background-color: #638d2b;
-}
-.bg-green-suchov {
-    background-color: #218838;
-}
-.bg-orange {
-    background-color: #ED7931;
 }

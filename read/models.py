@@ -63,4 +63,19 @@ class Book(models.Model):
 
 class Page(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='pages')
+    number = models.SmallIntegerField()
     text = models.TextField()
+
+    @property
+    def text_snippet(self):
+        max_length = 50
+        if len(self.text) <= max_length:
+            return f'{self.text}'
+        else:
+            return f'{self.text[0:max_length]}...'
+    
+    def __str__(self):
+        return f'{self.book}, pg. {self.number} ({self.text_snippet})'
+
+    class Meta:
+        ordering = ['book', 'number',]
