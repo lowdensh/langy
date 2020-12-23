@@ -6,23 +6,27 @@
 <div class="container mt-5 mb-5">
 
     <div class="row mt-5 justify-content-center">
-        <div class="col-8 text-center">
+        <div class="col text-center">
             <h1>{{ book.title }}</h1>
             <h2>By {{ book.author.full_name }}</h2>
         </div>
     </div>
 
-    <!-- Actions: All Users -->
+    <!-- Actions (All Users) -->
     <div class="row mt-5 justify-content-center">
         <div class="col text-center">
-            <a class="btn btn-secondary btn-lg" href="{% url 'read:my_books' %}" role="button">Back</a>
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:my_books' %}" role="button">
+                <i class="material-icons" style="vertical-align: text-bottom;">arrow_back</i> Back
+            </a>
             {% if book.has_pages %}
-                <a class="btn btn-success btn-lg ml-3" href="{% url 'read:read' book.id %}" role="button">Read!</a>
+                <a class="btn btn-success btn-lg ml-3" href="{% url 'read:read' book.id %}" role="button">
+                    <i class="material-icons" style="vertical-align: text-bottom;">menu_book</i> Read!
+                </a>
             {% endif %}
         </div>
     </div>
 
-    <!-- Actions: Superusers -->
+    <!-- Actions (Superusers) -->
     {% if user.is_superuser %}
         <div class="row mt-3 justify-content-center">
             <div class="col text-center">
@@ -31,10 +35,14 @@
         </div>
     {% endif %}
 
-    <div class="row mt-5">
-        <div class="col text-justify">
+    <!-- Details -->
+    <div class="row mt-5 justify-content-center">
+        <div class="col-lg-8 col-md-6 mb-3 text-justify">
             <h3>Summary</h3>
-            {{ book.summary }}
+            {{ book.summary_text }}
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <img src="{{ book.cover.url }}" width="100%">
         </div>
     </div>
 

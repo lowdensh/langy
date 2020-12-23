@@ -12,8 +12,17 @@ import json, pdfplumber, re
 @login_required
 def my_books(request):
     template = 'read/my-books.html'
+    books = Book.objects.all()
+    books_readable = []
+    books_unreadable = []
+    for book in books:
+        if book.has_pages:
+            books_readable.append(book)
+        else:
+            books_unreadable.append(book)
     context = {
-        'book_list': Book.objects.all()
+        'books_readable': books_readable,
+        'books_unreadable': books_unreadable
     }
     return render(request, template, context)
 

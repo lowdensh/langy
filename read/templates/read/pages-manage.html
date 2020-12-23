@@ -7,19 +7,22 @@
 
     <div class="row mt-5 justify-content-center">
         <div class="col-8 text-center">
-            <h1>{{ book.title }}</h1>
-            <h2>By {{ book.author.full_name }}</h2>
+            <h1>Manage Pages</h1>
+            <h2>{{ book.title }}</h2>
+            <span class="su-area">Superuser Area</span>
         </div>
     </div>
 
     <div class="row mt-5 justify-content-center">
         <div class="col text-center">
-            <a class="btn btn-secondary btn-lg" href="{% url 'read:details' book.id %}" role="button">Back</a>
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:details' book.id %}" role="button">
+                <i class="material-icons" style="vertical-align: text-bottom;">arrow_back</i> Back
+            </a>
         </div>
     </div>
 
     <div class="row mt-5">
-        <div class="col text-justify">
+        <div class="col">
             <h3>Upload PDF</h3>
             {% if book.has_pdf %}
                 <p>Uploading a new PDF will permanently delete and replace the existing one.</p>

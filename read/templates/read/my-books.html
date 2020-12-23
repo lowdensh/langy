@@ -6,14 +6,91 @@
 
 <div class="container mb-5">
 
+    <!-- Toggle between cover/list view for Books -->
     <div class="row mt-5 justify-content-center">
-        {% for book in book_list %}
-        <div class="col-8 text-center">
-            <h1 class="mb-3"><a href="{% url 'read:details' book.id %}">{{ book.title }}</a></h1>
-        </div>
+    <div class="col text-center">
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <!-- cover -->
+        <label class="btn btn-secondary active">
+            <input id="cover-view-radio" type="radio" name="options" checked>
+            <i class="material-icons" style="vertical-align: middle;">insert_photo</i> covers
+        </label>
+        <!-- list -->
+        <label class="btn btn-secondary">
+            <input id="list-view-radio" type="radio" name="options">
+            <i class="material-icons" style="vertical-align: middle;">table_rows</i> list
+        </label>
+    </div>
+    </div>
+    </div>
+
+    <!-- Readable Books: cover view (All Users) -->
+    <div id="cover-view" class="row mt-5 justify-content-center">
+        {% for book in books_readable %}
+            <div class="col-xl-4 col-md-6 col-10 px-4 mb-5 text-center">
+                <a href="{% url 'read:details' book.id %}">
+                    <img src="{{ book.cover.url }}" width="100%">
+                </a>
+                <h3 class="mt-2"><a href="{% url 'read:details' book.id %}">
+                    {{ book.title }}
+                </a></h3>
+            </div>
         {% endfor %}
     </div>
+
+    <!-- Readable Books: list view (All Users) -->
+    <div id="list-view" class="row mt-5 justify-content-center">
+        <div class="col text-center">
+            {% for book in books_readable %}
+                <h1 class="mb-5"><a href="{% url 'read:details' book.id %}">
+                    {{ book.title }}
+                </a></h1>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Unreadable Books (Superusers) -->
+    {% if user.is_superuser %}
+        <div class="row mt-5 justify-content-center">
+            <div class="col text-center">
+
+                <h2>Unreadable Books</h2>
+                <span class="su-area">Superuser Area</span>
+                
+                {% if books_unreadable %}
+                    <p>The following books have no pages:</p>
+                    {% for book in books_unreadable %}
+                        <h1 class="mb-3"><a href="{% url 'read:details' book.id %}">{{ book.title }}</a></h1>
+                    {% endfor %}
+                {% else %}
+                    <p>There are no unreadable books. All books have pages! :)</p>
+                {% endif %}
+
+            </div>
+        </div>
+    {% endif %}
     
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function checkViewSetting() {
+        if ($("#cover-view-radio").prop("checked")) {
+            $("#cover-view").show()
+            $("#list-view").hide()
+        } else {
+            $("#cover-view").hide()
+            $("#list-view").show()
+        }
+    }
+
+    // When page loads
+    checkViewSetting()
+
+    // When user changes the view setting
+    $("input[type='radio']").on("change", function() {checkViewSetting()})
+
+</script>
 {% endblock %}

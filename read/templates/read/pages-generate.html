@@ -7,20 +7,23 @@
 
     <div class="row mt-5 justify-content-center">
         <div class="col-8 text-center">
-            <h1>{{ book.title }}</h1>
-            <h2>By {{ book.author.full_name }}</h2>
+            <h1>Generate Pages</h1>
+            <h2>{{ book.title }}</h2>
+            <span class="su-area">Superuser Area</span>
         </div>
     </div>
 
     <div class="row mt-5 justify-content-center">
         <div class="col text-center">
-            <a class="btn btn-secondary btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">Cancel</a>
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">
+                <i class="material-icons" style="vertical-align: text-bottom;">close</i> Cancel
+            </a>
         </div>
     </div>
 
     {% if book.has_pdf %}
         <div class="row mt-5">
-            <div class="col text-justify">
+            <div class="col">
                 Using PDF: <a href="{{ book.pdf.url }}" target="_blank">{{ book.pdf.name }}</a>
             </div>
         </div>
@@ -45,9 +48,13 @@
             {% endfor %}
             <div class="row mt-5 justify-content-center">
                 <div class="col text-center">
-                    <a class="btn btn-secondary btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">Cancel</a>
+                    <a class="btn btn-secondary btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">
+                        <i class="material-icons" style="vertical-align: text-bottom;">close</i> Cancel
+                    </a>
                     {% csrf_token %}
-                    <a id="btn-save" class="btn btn-success btn-lg ml-3" role="button">Save</a>
+                    <a id="btn-save" class="btn btn-success btn-lg ml-3" role="button">
+                        <i class="material-icons" style="vertical-align: text-bottom;">save</i> Save
+                    </a>
                 </div>
             </div>
         {% endif %}

@@ -1,9 +1,9 @@
 
 /* COLORS */
-/* https://coolors.co/f2f6ed-c4dab4-748e63-103409-638d2b-218838-ed7931 */
+/* https://coolors.co/f2f6ed-c4dab4-748e63-103409-638d2b-218838-ffc107-f4a800 */
 
 a {
-    color: #748e63;
+    color: #638D2B;
 }
 
 a:hover {
@@ -12,8 +12,8 @@ a:hover {
 }
 
 .btn-success {
-    background-color: #638d2b;
-    border-color: #638d2b;
+    background-color: #638D2B;
+    border-color: #638D2B;
 }
 
 .bg-forest {
@@ -33,7 +33,18 @@ input[type=password]:focus {
     background-color: #F2F6ED;
 }
 
+.su-area {
+    background-color: #FFC107;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: smaller;
+    margin-bottom: 10px;
+    padding: 1px 6px 3px 6px;
+    text-transform: uppercase;
+}
+
 textarea {
+    text-align: justify;
     resize: none;
 }
 

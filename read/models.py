@@ -27,10 +27,10 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.SET_DEFAULT, default=1)
+    source_url = models.URLField('Source URL')
     summary = models.TextField(max_length=1000, blank=True)
-    source_url = models.URLField()
-    cover = models.ImageField('Book Cover', blank=True, null=True, upload_to='book_covers')
-    pdf = models.FileField('Book PDF', blank=True, null=True, upload_to='book_pdfs')
+    cover = models.ImageField(upload_to='book_covers', default='book_covers/default.jpg')
+    pdf = models.FileField('PDF', blank=True, null=True, upload_to='book_pdfs')
 
     @property
     def page_count(self):
@@ -43,10 +43,16 @@ class Book(models.Model):
         return False
 
     @property
+    def summary_text(self):
+        if self.summary:
+            return self.summary
+        return f'{self.title}, written by {self.author.full_name}.'
+
+    @property
     def has_cover(self):
-        if self.cover:
-            return True
-        return False
+        if self.cover.name == 'book_covers/default.jpg':
+            return False
+        return True
 
     @property
     def has_pdf(self):
