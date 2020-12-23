@@ -16,11 +16,11 @@
     <div class="row mt-5 justify-content-center">
         <div class="col text-center">
             <a class="btn btn-secondary btn-lg" href="{% url 'read:my_books' %}" role="button">
-                <i class="material-icons" style="vertical-align: text-bottom;">arrow_back</i> Back
+                <i class="material-icons">arrow_back</i> Back
             </a>
             {% if book.has_pages %}
                 <a class="btn btn-success btn-lg ml-3" href="{% url 'read:read' book.id %}" role="button">
-                    <i class="material-icons" style="vertical-align: text-bottom;">menu_book</i> Read!
+                    <i class="material-icons">menu_book</i> Read!
                 </a>
             {% endif %}
         </div>

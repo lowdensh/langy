@@ -16,7 +16,7 @@
     <div class="row mt-5 justify-content-center">
         <div class="col text-center">
             <a class="btn btn-secondary btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">
-                <i class="material-icons" style="vertical-align: text-bottom;">close</i> Cancel
+                <i class="material-icons">close</i> Cancel
             </a>
         </div>
     </div>
@@ -49,11 +49,11 @@
             <div class="row mt-5 justify-content-center">
                 <div class="col text-center">
                     <a class="btn btn-secondary btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">
-                        <i class="material-icons" style="vertical-align: text-bottom;">close</i> Cancel
+                        <i class="material-icons">close</i> Cancel
                     </a>
                     {% csrf_token %}
                     <a id="btn-save" class="btn btn-success btn-lg ml-3" role="button">
-                        <i class="material-icons" style="vertical-align: text-bottom;">save</i> Save
+                        <i class="material-icons">save</i> Save
                     </a>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Logged Out | Langy{% endblock %}
+{% block title %}Log Out | Langy{% endblock %}
 {% load static %}
 
 {% block content %}
@@ -8,24 +8,34 @@
 
     <!-- Logo -->
     <div class="row mt-5 justify-content-center">
-        <div class="col-lg-5 text-center">
+        <div class="col-md-6 text-center">
             <img src="{% static 'images/langy.svg' %}" width="80%">
         </div>
     </div>
 
+    <!-- Main -->
     <div class="row mt-5 justify-content-center">
-        <div class="col-lg-5 text-center">
-            <p>You have been logged out.</p>
+        <div class="col-md-6 text-center">
+            <p>You have logged out.</p>
+            <p>You will be automatically redirected.</p>
         </div>
     </div>
-
-    <!-- Text links -->
-    <div class="row mt-5 justify-content-center">
-        <div class="group col-lg-5 text-center">
-            <p><a href="{% url 'login' %}">Return to login</a></p>
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-6 text-center">
+            <a class="btn btn-success btn-lg" href="{% url 'login' %}" role="button">
+                <i class="material-icons">home</i> Home
+            </a>
         </div>
     </div>
 
 </div>
   
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.setTimeout(function() {
+        window.location.href = "{% url 'login' %}"
+    }, 3000)
+</script>
 {% endblock %}

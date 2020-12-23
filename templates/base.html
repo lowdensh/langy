@@ -22,32 +22,41 @@
 <body>
 
     {% block navigation %}
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-forest">
+    <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-forest">
         <!-- Brand -->
-        <a class="navbar-brand" href="{% url 'read:my_books' %}">
+        <a class="navbar-brand" href="{% url 'empty_redirect' %}">
             <img src="{% static 'images/langy-ly.svg' %}" height="32" class="d-inline-block align-middle" alt="Langy Icon">
         </a>
+
         {% if user.is_authenticated %}
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
         <!-- Content -->
-        <div class="collapse navbar-collapse">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
             <!-- Main Links -->
             <div class="navbar-nav">
                 <a class="nav-item nav-link active" href="{% url 'read:my_books' %}">Read</a>
             </div>
+
             <!-- User Section -->
             <div class="nav-item dropdown ml-auto">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle pl-0" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ user.display_name }}
                 </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                    <span class="dropdown-header small">Signed in as<br><b>{{ user.email }}</b></span>
+                <div class="dropdown-menu dropdown-menu-md-right" aria-labelledby="navbarDropdownMenuLink">
+                    <span class="dropdown-header"><b>{{ user.email }}</b></span>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'users:profile' user.id %}">My Profile</a>
                     <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                 </div>
             </div>
+
         </div>
         {% endif %}
+
     </nav>
     {% endblock %}
 

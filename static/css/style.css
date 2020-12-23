@@ -11,6 +11,10 @@ a:hover {
     text-decoration: none;
 }
 
+body {
+    background-color: #F2F6ED;
+}
+
 .btn-success {
     background-color: #638D2B;
     border-color: #638D2B;
@@ -25,12 +29,30 @@ a:hover {
     letter-spacing: 0.05em;
 }
 
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #F2F6ED;
+}
+
+.dropdown-item:active {
+    background-color: #C4DAB4;
+    color: #212529;
+}
+
 input[type=text],
 input[type=text]:focus,
 input[type=password],
-input[type=password]:focus {
+input[type=password]:focus,
+input[type=email],
+input[type=email]:focus {
     text-align: center;
-    background-color: #F2F6ED;
+}
+
+i.material-icons {
+    vertical-align: text-bottom;
+}
+label i.material-icons {
+    vertical-align: middle;
 }
 
 .su-area {
@@ -46,9 +68,4 @@ input[type=password]:focus {
 textarea {
     text-align: justify;
     resize: none;
-}
-
-textarea.form-control,
-textarea.form-control:focus {
-    background-color: #F2F6ED;
 }
