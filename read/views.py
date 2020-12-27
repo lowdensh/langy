@@ -122,6 +122,17 @@ def pages_save(request, book_id):
     except Exception:
         return HttpResponseBadRequest('Bad request')
 
+
+@login_required
+def read(request, book_id):
+    template = 'read/read.html'
+    book = get_object_or_404(Book, pk=book_id)
+    context = {
+        'book': book
+    }
+    return render(request, template, context)
+
+
 # wip read functionality
 @login_required
 def read_wip(request):
@@ -181,18 +192,5 @@ def read_wip(request):
         'author_name': book.author.full_name,
         'word_list': english_word_list,
         'paragraph_list': paragraph_list
-    }
-    return render(request, template, context)
-
-
-# https://docs.djangoproject.com/en/3.1/topics/auth/default/#limiting-access-to-logged-in-users-that-pass-a-test
-# user should own the book
-@login_required
-def read(request, book_id):
-    template = 'read/read.html'
-    book = get_object_or_404(Book, pk=book_id)
-    context = {
-        'book': book,
-        'author_name': book.author.full_name
     }
     return render(request, template, context)

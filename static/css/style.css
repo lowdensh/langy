@@ -5,7 +5,6 @@
 a {
     color: #638D2B;
 }
-
 a:hover {
     color: #218838;
     text-decoration: none;
@@ -15,16 +14,21 @@ body {
     background-color: #F2F6ED;
 }
 
-.btn-success {
-    background-color: #638D2B;
-    border-color: #638D2B;
-}
-
 .bg-forest {
     background-color: #103409;
 }
 
-.container {
+.btn-success {
+    background-color: #638D2B;
+    border-color: #638D2B;
+}
+.btn-success:disabled {
+    background-color: #A0A6AB;
+    border-color: #A0A6AB;
+}
+
+.container,
+.container-fluid {
     font-size: 1.3em;
     letter-spacing: 0.05em;
 }
@@ -33,10 +37,15 @@ body {
 .dropdown-item:focus {
     background-color: #F2F6ED;
 }
-
 .dropdown-item:active {
     background-color: #C4DAB4;
     color: #212529;
+}
+.dropdown-toggle {
+    color: rgba(255,255,255,.5);
+}
+.dropdown-toggle:hover {
+    color: #C4DAB4;
 }
 
 input[type=text],
@@ -51,7 +60,8 @@ input[type=email]:focus {
 i.material-icons {
     vertical-align: text-bottom;
 }
-label i.material-icons {
+label i.material-icons,
+.nav-link i.material-icons {
     vertical-align: middle;
 }
 

@@ -1,11 +1,64 @@
-p {
-    background-color: #edf7e5;
-    font-family: "Mali", "Lucida Sans Unicode", sans-serif;
+/* base.html navigation */
+#nav-base {
+    display: none;
+}
+
+/* #bar-top */
+.navbar-brand {
+    overflow-x: hidden;
+}
+/* smaller than Bootstrap Medium */
+@media only screen and (max-width: 767px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+}
+
+/* #bar-bottom */
+#bar-bottom {
+    background-color: #F2F6ED;
+    border-top: 2px solid #103409;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.arrow {
+    font-size: 3em;
+}
+/* smaller than Bootstrap Medium */
+@media only screen and (max-width: 767px) {
+    .arrow {
+        font-size: 2em;
+    }
+}
+
+/* pages */
+html, body, #pages {
+    height: 100%;
+}
+#pages {
+    overflow-y: auto;
+}
+.page {
+    background-color: #e6f1dd;
+    border-radius: 8px;
+    font-family: "Mali", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     font-size: 1.5em;
     letter-spacing: 0.1em;
     line-height: 1.8em;
-    padding: 10px;
-    margin-bottom: 20px;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    overflow-wrap: break-word;
+    scroll-margin: 3rem;
+}
+/* smaller than Bootstrap Medium */
+@media only screen and (max-width: 767px) {
+    .page {
+        font-size: 1.2em;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        scroll-margin: 1rem;
+    }
 }
 
 .tappyWord {

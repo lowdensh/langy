@@ -8,26 +8,113 @@
 
 {% block content %}
 
-<div class="container mt-5 mb-5">
+<nav id="bar-top" class="navbar sticky-top navbar-dark bg-forest">
+    <span class="navbar-brand h1 mb-0">{{ book.title }}</span>
+    <div class="navbar-nav ml-auto">
+        <a class="nav-item nav-link" href="{% url 'read:details' book.id %}">
+            Quit <i class="material-icons">close</i>
+        </a>
+    </div>
+</nav>
 
-    <div class="row mt-5 justify-content-center">
-        <div class="col-8 text-center">
-            <h1>{{ book.title }}</h1>
+<div id="pages">
+    <div class="container-fluid h-100">
+        <div class="row h-100 justify-content-center">
+            <div class="col-lg-10 col-md-11 col-12 my-auto text-center">
+                {% for page in book.pages.all %}
+                    <div id="{{ page.number }}" class="page p-3">
+                        {{ page.text }}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-
-    <div class="row mt-1 justify-content-center">
-        <div class="col text-center">
-            <h2>By {{ author_name }}</h2>
-        </div>
-    </div>
-
-    <div class="row mt-5 justify-content-center">
-        <p>
-            book text... looootsa book text here
-        </p>
-    </div>
-
 </div>
 
+<div id="bar-bottom" class="fixed-bottom">
+    <div class="row">
+        <!-- Arrow page navigation -->
+        <div class="col-xs-auto order-first text-left">
+            <button id="btn-page-prev" class="btn btn-success btn-lg px-0 py-2 m-3 ml-4">
+                <i class="material-icons arrow">chevron_left</i>
+            </button>
+        </div>
+        <div class="col-xs-auto order-last text-right">
+            <button id="btn-page-next" class="btn btn-success btn-lg px-0 py-2 m-3 mr-4">
+                <i class="material-icons arrow">chevron_right</i>
+            </button>
+        </div>
+        <!-- Word details -->
+        <div class="col my-auto text-center">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var current_page = 1
+    var last_page = "{{ book.page_count }}"
+
+    function changePagesHeight() {
+        var bars_height = $("#bar-top").outerHeight(true) + $("#bar-bottom").outerHeight(true)
+        $("#pages").height($(window).height() - bars_height)
+    }
+
+    function nextPage() {
+        if (current_page < last_page) {
+            current_page++
+            changeDisplayedPage()
+        }
+    }
+
+    function prevPage() {
+        if (current_page > 1) {
+            current_page--
+            changeDisplayedPage()
+        }
+    }
+
+    function changeDisplayedPage() {
+        // Hide all pages
+        $(".page").css("display", "none")
+        // Show current page
+        $("#" + current_page).show()
+        // Go to the top of the current page
+        document.getElementById(current_page).scrollIntoView()
+
+        // Disable buttons based on the current page
+        if (current_page == 1) {
+            $("#btn-page-prev").attr("disabled", true)
+        } else if (current_page == last_page) {
+            $("#btn-page-next").attr("disabled", true)
+        } else {
+            $("#btn-page-prev").attr("disabled", false)
+            $("#btn-page-next").attr("disabled", false)
+        }
+    }
+
+    // On page load
+    changeDisplayedPage()
+    changePagesHeight()
+
+    // On window resize
+    window.onresize = function() {changePagesHeight()}
+
+    // When user changes page with buttons or arrow keys
+    $("#btn-page-next").on("click", function() {nextPage()})
+    $("#btn-page-prev").on("click", function() {prevPage()})
+    $(document).keydown(function(e) {
+        // Next page: right arrow key
+        if (e.key == "ArrowRight") {
+            $("#btn-page-next").click()
+        }
+        // Previous page: left arrow key
+        else if (e.key == "ArrowLeft") {
+            $("#btn-page-prev").click()
+        }
+    })
+
+</script>
 {% endblock %}
