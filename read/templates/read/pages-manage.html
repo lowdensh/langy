@@ -3,9 +3,9 @@
 
 {% block content %}
 
-<div class="container mt-5 mb-5">
+<div class="container mt-md-5 mt-4 mb-5">
 
-    <div class="row mt-5 justify-content-center">
+    <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-8 text-center">
             <h1>Manage Pages</h1>
             <h2>{{ book.title }}</h2>
@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <div class="row mt-5 justify-content-center">
+    <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col text-center">
             <a class="btn btn-secondary btn-lg" href="{% url 'read:details' book.id %}" role="button">
                 <i class="material-icons">arrow_back</i> Back
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-md-5 mt-4">
         <div class="col">
             <h3>Upload PDF</h3>
             {% if book.has_pdf %}
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-md-5 mt-4">
         <div class="col text-justify">
             <h3>Generate Pages</h3>
             {% if book.has_pdf %}
@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-md-5 mt-4">
         <div class="col text-justify">
             <h3>Edit Pages</h3>
             {% if book.has_pages %}

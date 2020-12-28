@@ -3,9 +3,9 @@
 
 {% block content %}
 
-<div class="container mt-5 mb-5">
+<div class="container mt-md-5 mt-4 mb-5">
 
-    <div class="row mt-5 justify-content-center">
+    <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-md-8 text-center">
             <h1>{{ book.title }}</h1>
             <h2>By {{ book.author.full_name }}</h2>
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Actions (All Users) -->
-    <div class="row mt-5 justify-content-center">
+    <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col text-center">
             <a class="btn btn-secondary btn-lg" href="{% url 'read:my_books' %}" role="button">
                 <i class="material-icons">arrow_back</i> Back
@@ -36,12 +36,12 @@
     {% endif %}
 
     <!-- Details -->
-    <div class="row mt-5 justify-content-center">
-        <div class="col-lg-8 col-md-6 mb-3 text-justify">
+    <div class="row mt-md-5 mt-4 justify-content-center">
+        <div class="col-lg-8 col-lg-6 col-md-8 mb-3 text-justify">
             <h3>Summary</h3>
             {{ book.summary_text }}
         </div>
-        <div class="col-lg-4 col-md-6 col-10">
+        <div class="col-lg-4 col-lg-6 col-md-8 col-10">
             <img src="{{ book.cover.url }}" width="100%">
         </div>
     </div>

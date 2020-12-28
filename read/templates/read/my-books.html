@@ -7,7 +7,7 @@
 <div class="container mb-5">
 
     <!-- Toggle between cover/list view for Books -->
-    <div class="row mt-5 justify-content-center">
+    <div class="row mt-md-5 mt-4 justify-content-center">
     <div class="col text-center">
     <div class="btn-group btn-group-toggle" data-toggle="buttons">
         <!-- cover -->
@@ -25,9 +25,9 @@
     </div>
 
     <!-- Readable Books: cover view (All Users) -->
-    <div id="cover-view" class="row mt-5 justify-content-center">
+    <div id="cover-view" class="row mt-md-5 mt-4 justify-content-center">
         {% for book in books_readable %}
-            <div class="col-xl-4 col-md-6 col-10 px-4 mb-5 text-center">
+            <div class="col-xl-4 col-md-5 col-10 px-4 mb-md-5 mb-3 text-center">
                 <a href="{% url 'read:details' book.id %}">
                     <img src="{{ book.cover.url }}" width="100%">
                 </a>
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Readable Books: list view (All Users) -->
-    <div id="list-view" class="row mt-5 justify-content-center">
+    <div id="list-view" class="row mt-md-5 mt-4 justify-content-center">
         <div class="col text-center">
             {% for book in books_readable %}
                 <h1 class="mb-5"><a href="{% url 'read:details' book.id %}">
@@ -51,7 +51,7 @@
 
     <!-- Unreadable Books (Superusers) -->
     {% if user.is_superuser %}
-        <div class="row mt-5 justify-content-center">
+        <div class="row mt-md-5 mt-4 justify-content-center">
             <div class="col text-center">
 
                 <h2>Unreadable Books</h2>
