@@ -7,14 +7,28 @@
 .navbar-brand {
     overflow-x: hidden;
 }
-/* smaller than Bootstrap Medium */
 @media only screen and (max-width: 767px) {
+    /* smaller than Bootstrap Medium */
     .navbar-brand {
         font-size: 1rem;
     }
 }
 
+/* #bar-progress */
+.bg-success {
+    background-color: #638D2B!important;
+}
+
 /* #bar-bottom */
+.arrow {
+    font-size: 3em;
+}
+@media only screen and (max-width: 767px) {
+    /* smaller than Bootstrap Medium */
+    .arrow {
+        font-size: 2em;
+    }
+}
 #bar-bottom {
     background-color: #F2F6ED;
     border-top: 2px solid #103409;
@@ -22,13 +36,15 @@
     bottom: 0;
     width: 100%;
 }
-.arrow {
-    font-size: 3em;
+.progress {
+    font-size: 1rem;
+    height: 1.5rem;
 }
-/* smaller than Bootstrap Medium */
 @media only screen and (max-width: 767px) {
-    .arrow {
-        font-size: 2em;
+    /* smaller than Bootstrap Medium */
+    .progress {
+        font-size: 0.7rem;
+        height: 1rem;
     }
 }
 
@@ -40,24 +56,46 @@ html, body, #pages {
     overflow-y: auto;
 }
 .page {
+    margin-top: 3rem;
+    scroll-margin: 3rem;
+}
+.page-image {
+    height: 300px;
+    margin-bottom: 3rem;
+}
+.page-image img {
+    background-color: #e6f1dd;
+    border-radius: 8px;
+    max-height: 100%;
+    max-width: 100%;
+    opacity: 0.85;
+}
+.page-text {
     background-color: #e6f1dd;
     border-radius: 8px;
     font-family: "Mali", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     font-size: 1.5em;
     letter-spacing: 0.1em;
     line-height: 1.8em;
-    margin-top: 3rem;
     margin-bottom: 3rem;
     overflow-wrap: break-word;
-    scroll-margin: 3rem;
 }
-/* smaller than Bootstrap Medium */
 @media only screen and (max-width: 767px) {
+    /* smaller than Bootstrap Medium */
     .page {
-        font-size: 1.2em;
         margin-top: 1rem;
-        margin-bottom: 1rem;
         scroll-margin: 1rem;
+    }
+    .page-image {
+        height: 100%;
+        margin-bottom: 1rem;
+        max-height: 300px;
+    }
+    .page-text {
+        font-size: 1.2em;
+        letter-spacing: 0.05em;
+        line-height: 1.6em;
+        margin-bottom: 1rem;
     }
 }
 

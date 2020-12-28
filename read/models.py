@@ -1,4 +1,6 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
+from nltk import tokenize
 
 
 class Author(models.Model):
@@ -30,7 +32,10 @@ class Book(models.Model):
     source_url = models.URLField('Source URL')
     summary = models.TextField(max_length=1000, blank=True)
     cover = models.ImageField(upload_to='book_covers', default='book_covers/default.jpg')
-    pdf = models.FileField('PDF', blank=True, null=True, upload_to='book_pdfs')
+    pdf = models.FileField(
+        'PDF', upload_to='book_pdfs', blank=True, null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])]
+    )
 
     @property
     def page_count(self):
@@ -71,6 +76,7 @@ class Page(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='pages')
     number = models.SmallIntegerField()
     text = models.TextField()
+    image = models.ImageField(upload_to='book_page_images', blank=True, null=True)
 
     @property
     def text_snippet(self):
@@ -79,6 +85,24 @@ class Page(models.Model):
             return f'{self.text}'
         else:
             return f'{self.text[0:max_length]}...'
+
+    @property
+    def sentences(self):
+        # NLTK sentence tokenizer
+        return tokenize.sent_tokenize(self.text)
+
+    @property
+    def text_half_1(self):
+        half = len(self.sentences)//2
+        # Join list of sentences (strings) into one, with spaces between
+        # If there is only one sentence, this half is empty
+        return ' '.join(self.sentences[:half])
+
+    @property
+    def text_half_2(self):
+        half = len(self.sentences)//2
+        # If there is only one sentence, this half contains it
+        return ' '.join(self.sentences[half:])
     
     def __str__(self):
         return f'{self.book}, pg. {self.number} ({self.text_snippet})'

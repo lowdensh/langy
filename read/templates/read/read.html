@@ -22,8 +22,16 @@
         <div class="row h-100 justify-content-center">
             <div class="col-lg-10 col-md-11 col-12 my-auto text-center">
                 {% for page in book.pages.all %}
-                    <div id="{{ page.number }}" class="page p-3">
-                        {{ page.text }}
+                    <div id="{{ page.number }}" class="page">
+                        {% if page.image %}
+                            <!-- If the page has an image, display it between halves of page text -->
+                            <div class="page-text p-3">{{ page.text_half_1 }}</div>
+                            <div class="page-image"><img src="{{ page.image.url }}"></div>
+                            <div class="page-text p-3">{{ page.text_half_2 }}</div>
+                        {% else %}
+                            <!-- Otherwise, just display the full page text together -->
+                            <div class="page-text p-3">{{ page.text }}</div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -35,17 +43,24 @@
     <div class="row">
         <!-- Arrow page navigation -->
         <div class="col-xs-auto order-first text-left">
-            <button id="btn-page-prev" class="btn btn-success btn-lg px-0 py-2 m-3 ml-4">
+            <button id="btn-page-prev" class="btn btn-success btn-lg px-0 py-2 m-md-3 m-2 ml-md-4 ml-4">
                 <i class="material-icons arrow">chevron_left</i>
             </button>
         </div>
         <div class="col-xs-auto order-last text-right">
-            <button id="btn-page-next" class="btn btn-success btn-lg px-0 py-2 m-3 mr-4">
+            <button id="btn-page-next" class="btn btn-success btn-lg px-0 py-2 m-md-3 m-2 mr-md-4 mr-4">
                 <i class="material-icons arrow">chevron_right</i>
             </button>
         </div>
         <!-- Word details -->
         <div class="col my-auto text-center">
+        </div>
+    </div>
+    <!-- Page progress bar -->
+    <div class="row mx-2 mb-2">
+        <div class="col my-auto p-0 progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar">
+            </div>
         </div>
     </div>
 </div>
@@ -93,6 +108,10 @@
             $("#btn-page-prev").attr("disabled", false)
             $("#btn-page-next").attr("disabled", false)
         }
+
+        // Update progress bar
+        $(".progress-bar").width((current_page / last_page)*100 + "%")
+        $(".progress-bar").text(current_page + "/" + last_page)
     }
 
     // On page load
@@ -102,16 +121,18 @@
     // On window resize
     window.onresize = function() {changePagesHeight()}
 
-    // When user changes page with buttons or arrow keys
+    // When user wants to change page with buttons or left/right arrow keys
     $("#btn-page-next").on("click", function() {nextPage()})
     $("#btn-page-prev").on("click", function() {prevPage()})
     $(document).keydown(function(e) {
         // Next page: right arrow key
         if (e.key == "ArrowRight") {
+            $("#btn-page-next").focus()
             $("#btn-page-next").click()
         }
         // Previous page: left arrow key
         else if (e.key == "ArrowLeft") {
+            $("#btn-page-prev").focus()
             $("#btn-page-prev").click()
         }
     })
