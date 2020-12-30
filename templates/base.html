@@ -51,7 +51,10 @@
                 <div class="dropdown-menu dropdown-menu-md-right" aria-labelledby="navbarDropdownMenuLink">
                     <span class="dropdown-header"><b>{{ user.email }}</b></span>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{% url 'users:profile' user.id %}">My Profile</a>
+                    <a class="dropdown-item" href="{% url 'users:profile' user.id %}">Profile</a>
+                    <a class="dropdown-item" href="{% url 'users:select_a_language' %}">Languages</a>
+                    <a class="dropdown-item" href="{% url 'users:profile' user.id %}">Settings</a>
+                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                 </div>
             </div>

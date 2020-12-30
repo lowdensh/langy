@@ -30,9 +30,8 @@ def my_books(request):
 @login_required
 def details(request, book_id):
     template = 'read/details.html'
-    book = get_object_or_404(Book, pk=book_id)
     context = {
-        'book': book
+        'book': get_object_or_404(Book, pk=book_id)
     }
     return render(request, template, context)
 
@@ -41,11 +40,9 @@ def details(request, book_id):
 @staff_member_required
 def pages_manage(request, book_id):
     template = 'read/pages-manage.html'
-    book = get_object_or_404(Book, pk=book_id)
-    form = BookPDFForm(instance=book)
     context = {
-        'book': book,
-        'form':  form
+        'book': get_object_or_404(Book, pk=book_id),
+        'form':  BookPDFForm(instance=book)
     }
     return render(request, template, context)
 
@@ -126,9 +123,8 @@ def pages_save(request, book_id):
 @login_required
 def read(request, book_id):
     template = 'read/read.html'
-    book = get_object_or_404(Book, pk=book_id)
     context = {
-        'book': book
+        'book': get_object_or_404(Book, pk=book_id)
     }
     return render(request, template, context)
 

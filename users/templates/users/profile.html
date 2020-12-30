@@ -4,12 +4,90 @@
 
 {% block content %}
 
-<div class="container mb-5">
+<div class="container mb-md-5 mb-4">
 
     <div class="row mt-md-5 mt-4 justify-content-center">
-        <div class="col text-center">
-            <h1>{{ user.display_name }}'s Profile</h1>
+        <div class="col-md-8 text-center">
+            <h1>{{ profile_user.display_name }}'s Profile</h1>
+            <span class="text-muted">Member since {{ profile_user.date_joined.date }}</span>
         </div>
+    </div>
+
+    <div class="row mt-md-5 mt-4 justify-content-center">
+
+        <!-- Side nav -->
+        <div class="col-lg-4 mb-4">
+            <div class="list-group">
+                <span class="list-group-item active">
+                    Profile
+                </span>
+                <a class="list-group-item" href="{% url 'users:select_a_language' %}">
+                    Languages
+                </a>
+                <a class="list-group-item" href="{% url 'users:profile' user.id %}">
+                    Settings
+                </a>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-lg-8">
+            <div id="accordion">
+                {% for llang in learning_languages %}
+                    <!-- Card: expanded if this is the profile user's active learning language -->
+                    <div class="card">
+                        <!-- Header -->
+                        {% if llang.foreign_language.english_name == active_language %}
+                            <a class="card-header" id="h-{{ llang.foreign_language.english_name }}" data-toggle="collapse" data-target="#c-{{ llang.foreign_language.english_name }}" aria-expanded="true" aria-controls="c-{{ llang.foreign_language.english_name }}">
+                        {% else %}
+                            <a class="card-header collapsed" id="h-{{ llang.foreign_language.english_name }}" data-toggle="collapse" data-target="#c-{{ llang.foreign_language.english_name }}" aria-expanded="false" aria-controls="c-{{ llang.foreign_language.english_name }}">
+                        {% endif %}
+                            <img src="{{ llang.foreign_language.flag.url }}" class="mr-3" width="30px">
+                            {{ llang.foreign_language.english_name }}
+                        </a>
+                        <!-- Collapse -->
+                        {% if llang.foreign_language.english_name == active_language %}
+                            <div id="c-{{ llang.foreign_language.english_name }}" class="collapse show" aria-labelledby="h-{{ llang.foreign_language.english_name }}" data-parent="#accordion">
+                        {% else %}
+                            <div id="c-{{ llang.foreign_language.english_name }}" class="collapse" aria-labelledby="h-{{ llang.foreign_language.english_name }}" data-parent="#accordion">
+                        {% endif %}
+                            <!-- Content -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Details -->
+                                    <div class="col-md-8 mt-md-0 mt-4 text-justify">
+                                        Started learning on {{ llang.date_started.date }}
+                                    </div>
+                                    <!-- Image and action button -->
+                                    <div class="col-md-4 mb-md-3 mb-0 order-md-last order-first text-center">
+                                        <img src="{{ llang.foreign_language.flag.url }}" class="py-3" width="50%">
+                                        <span class="h5">
+                                            <br>
+                                            {{ llang.foreign_language.native_name }}
+                                            {% if llang.foreign_language.note %}
+                                                <br>({{ llang.foreign_language.note }})
+                                            {% endif %}
+                                        </span>
+                                        {% if llang.foreign_language.english_name == active_language %}
+                                            <br>
+                                            <button id="{{ llang.foreign_language.english_name }}" class="btn btn-learn btn-success btn-lg mt-3" disabled>
+                                                Active
+                                            </button>
+                                        {% else %}
+                                            <br>
+                                            <button id="{{ llang.foreign_language.english_name }}" class="btn btn-learn btn-success btn-lg mt-3">
+                                                <i class="material-icons">school</i> Learn
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
     
 </div>

@@ -15,8 +15,7 @@ class ForeignLanguage(models.Model):
         help_text=('The amount of learners this language course has on Duolingo. See <a '
             'href="https://www.duolingo.com/courses">Duolingo Courses</a>.')
     )
-    flag_flat = models.ImageField(upload_to='language_flags/flat')
-    flag_button = models.ImageField(upload_to='language_flags/button')
+    flag = models.ImageField(upload_to='language_flags')
 
     class Meta:
         ordering = ['english_name']
@@ -25,16 +24,16 @@ class ForeignLanguage(models.Model):
         return self.english_name
 
     @property
-    def popularity_score(self):
+    def popularity(self):
         # A measure of how popular a language is to learn
         return int(self.duolingo_learners/1000)
 
 
 class LearningLanguage(models.Model):
-    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='learning')
     foreign_language = models.OneToOneField(to='ForeignLanguage', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
-    xp = models.PositiveIntegerField(verbose_name='Experience', default=0)
+    date_started = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['user', 'foreign_language']
