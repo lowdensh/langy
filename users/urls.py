@@ -7,4 +7,5 @@ urlpatterns = [
     path('sign-up', views.sign_up, name='sign_up'),
     path('profile/<int:id>', views.profile, name='profile'),
     path('select-a-language', views.select_a_language, name='select_a_language'),
+    path('set-active-language/<str:english_name>', views.set_active_language, name='set_active_language'),
 ]

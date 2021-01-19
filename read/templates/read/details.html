@@ -30,7 +30,9 @@
     {% if user.is_superuser %}
         <div class="row mt-3 justify-content-center">
             <div class="col text-center">
-                <a class="btn btn-warning btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">Manage Pages</a>
+                <a class="btn btn-warning btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">
+                    Manage Pages
+                </a>
             </div>
         </div>
     {% endif %}

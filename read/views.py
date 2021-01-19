@@ -11,47 +11,47 @@ import json, pdfplumber, re
 
 @login_required
 def my_books(request):
-    template = 'read/my-books.html'
     books = Book.objects.all()
     books_readable = []
     books_unreadable = []
+
     for book in books:
         if book.has_pages:
             books_readable.append(book)
         else:
             books_unreadable.append(book)
+
     context = {
         'books_readable': books_readable,
         'books_unreadable': books_unreadable
     }
-    return render(request, template, context)
+    return render(request, 'read/my-books.html', context)
 
 
 @login_required
 def details(request, book_id):
-    template = 'read/details.html'
     context = {
         'book': get_object_or_404(Book, pk=book_id)
     }
-    return render(request, template, context)
+    return render(request, 'read/details.html', context)
 
 
 @login_required
 @staff_member_required
 def pages_manage(request, book_id):
-    template = 'read/pages-manage.html'
+    book = get_object_or_404(Book, pk=book_id)
+
     context = {
-        'book': get_object_or_404(Book, pk=book_id),
+        'book': book,
         'form':  BookPDFForm(instance=book)
     }
-    return render(request, template, context)
+    return render(request, 'read/pages-manage.html', context)
 
 
 @login_required
 @staff_member_required
 def pages_upload_pdf(request, book_id):
     try:
-        template = 'read/pages-manage.html'
         book = get_object_or_404(Book, pk=book_id)
 
         if request.method == 'POST':
@@ -61,11 +61,12 @@ def pages_upload_pdf(request, book_id):
                 form.save()
 
         form = BookPDFForm(instance=book)  
+
         context = {
             'book': book,
             'form': form
         }
-        return render(request, template, context)
+        return render(request, 'read/pages-manage.html', context)
 
     except Exception:
         return HttpResponseBadRequest('Bad request')
@@ -74,8 +75,8 @@ def pages_upload_pdf(request, book_id):
 @login_required
 @staff_member_required
 def pages_generate(request, book_id):
-    template = 'read/pages-generate.html'
     book = get_object_or_404(Book, pk=book_id)
+
     if book.has_pdf:
         text_content = []
         with pdfplumber.open(book.pdf) as pdf:
@@ -91,7 +92,7 @@ def pages_generate(request, book_id):
         'book': book,
         'text_content': text_content
     }
-    return render(request, template, context)
+    return render(request, 'read/pages-generate.html', context)
 
 
 @login_required
@@ -122,11 +123,10 @@ def pages_save(request, book_id):
 
 @login_required
 def read(request, book_id):
-    template = 'read/read.html'
     context = {
         'book': get_object_or_404(Book, pk=book_id)
     }
-    return render(request, template, context)
+    return render(request, 'read/read.html', context)
 
 
 # wip read functionality

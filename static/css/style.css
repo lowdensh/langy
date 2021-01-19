@@ -43,7 +43,8 @@ body {
     background-color: #638D2B;
     border-color: #638D2B;
 }
-.btn-success:disabled {
+.btn-success:disabled,
+.btn-success.disabled {
     background-color: #748E63;
     border-color: #748E63;
 }
@@ -56,10 +57,10 @@ body {
 
 .dropdown-item:hover,
 .dropdown-item:focus {
-    background-color: #F2F6ED;
+    background-color: #F8F9FA;
 }
 .dropdown-item:active {
-    background-color: #C4DAB4;
+    background-color: #F8F9FA;
     color: #212529;
 }
 .dropdown-toggle {

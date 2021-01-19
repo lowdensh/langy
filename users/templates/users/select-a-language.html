@@ -32,37 +32,42 @@
         <!-- Main content -->
         <div class="col-lg-8">
             <div class="row">
-                {% for flang in foreign_languages %}
+                {% for foreign_language in foreign_languages %}
                     <div class="col-md-4 col-6 mb-md-4 mb-2 px-md-2 px-1">
-                        <!-- Card: appearance and action button changes if the user has this as their active learning language -->
-                        {% if flang.english_name == active_language %}
+                        <!-- Card: appearance and button changes if the user has this as their active learning language -->
+                        {% if foreign_language.english_name == active_language.foreign_language.english_name %}
                             <div class="card text-center border-success">
                         {% else %}
                             <div class="card text-center">
                         {% endif %}
+
                             <!-- Header -->
-                            {% if flang.english_name == active_language %}
+                            {% if foreign_language.english_name == active_language.foreign_language.english_name %}
                                 <div class="card-header bg-success">
                             {% else %}
                                 <div class="card-header">
                             {% endif %}
-                                {{ flang.english_name }}
+                                {{ foreign_language.english_name }}
+                                {% if foreign_language.english_name == active_language.foreign_language.english_name %}
+                                    <i class="material-icons">check_circle</i>
+                                {% endif %}
                             </div>
+
                             <!-- Content -->
                             <div class="card-body">
                                 <!-- Image -->
-                                <img src="{{ flang.flag.url }}" class="pb-3" width="50%">
+                                <img src="{{ foreign_language.flag.url }}" class="pb-3 w-50">
                                 <!-- Button -->
-                                {% if flang.english_name == active_language %}
+                                {% if foreign_language.english_name == active_language.foreign_language.english_name %}
                                     <br>
-                                    <button id="{{ flang.english_name }}" class="btn btn-learn btn-success btn-lg mt-1" disabled>
+                                    <a class="btn btn-learn btn-success btn-lg mt-1 disabled" role="button">
                                         Active
-                                    </button>
+                                    </a>
                                 {% else %}
                                     <br>
-                                    <button id="{{ flang.english_name }}" class="btn btn-learn btn-success btn-lg mt-1">
+                                    <a class="btn btn-learn btn-success btn-lg mt-1" href="{% url 'users:set_active_language' foreign_language.english_name %}" role="button">
                                         <i class="material-icons">school</i> Learn
-                                    </button>
+                                    </a>
                                 {% endif %}
                             </div>
                         </div>
