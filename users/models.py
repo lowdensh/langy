@@ -23,8 +23,31 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
 
-    class Meta:
-        ordering = ['-is_superuser', 'email']
+    # Get a user's active LearningLanguage
+    # Return None if user has no active LearningLanguage
+    @property
+    def active_language(self):
+        return next(
+            (
+                learning_language for learning_language in self.learning_languages.all()
+                if learning_language.is_active==True
+            ),
+            None
+        )
+
+    # Get a user's LearningLanguage by its English name
+    # Return None if user has no LearningLanguage for the given English name
+    def learning_language(self, english_name):
+        return next(
+        (
+            learning_language for learning_language in self.learning_languages.all()
+            if learning_language.foreign_language.english_name==english_name
+        ),
+        None
+    )
 
     def __str__(self):
         return f'{self.email} ({self.display_name})'
+
+    class Meta:
+        ordering = ['-is_superuser', 'email']

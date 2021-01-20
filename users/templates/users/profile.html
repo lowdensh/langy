@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ profile_user.display_name }}'s Profile | Langy{% endblock %}
+{% block title %}{{ profile_user.display_name }} | Langy{% endblock %}
 {% load static %}
 
 {% block content %}
@@ -8,7 +8,7 @@
 
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-md-8 text-center">
-            <h1>{{ profile_user.display_name }}'s Profile</h1>
+            <h1>{{ profile_user.display_name }}</h1>
             <span class="text-muted">Member since {{ profile_user.date_joined.date }}</span>
         </div>
     </div>
@@ -69,7 +69,7 @@
                                         Started learning on {{ learning_language.date_started.date }}
                                     </div>
 
-                                    <!-- Right: Image and Name -->
+                                    <!-- Right: Image, name, action buttons -->
                                     <div class="col-md-4 mb-md-3 mb-0 order-md-last order-first text-center">
                                         <!-- Image -->
                                         <img src="{{ learning_language.foreign_language.flag.url }}" class="py-3 w-50">
@@ -81,9 +81,10 @@
                                                 <br>({{ learning_language.foreign_language.note }})
                                             {% endif %}
                                         </span>
-                                        <!-- Button -->
+                                        <!-- Action Buttons -->
                                         <!-- Only show if this profile belongs to the logged in user -->
                                         {% if profile_user == user %}
+                                            <!-- Active/Learn -->
                                             {% if learning_language.foreign_language.english_name == active_language.foreign_language.english_name %}
                                                 <br>
                                                 <a class="btn btn-learn btn-success btn-lg mt-3 disabled" role="button">
@@ -91,16 +92,41 @@
                                                 </a>
                                             {% else %}
                                                 <br>
-                                                <a class="btn btn-learn btn-success btn-lg mt-3" href="{% url 'users:set_active_language' learning_language.foreign_language.english_name %}" role="button">
+                                                <a class="btn btn-success btn-lg mt-3"
+                                                    href="{% url 'users:set_active_language' learning_language.foreign_language.english_name %}"
+                                                    role="button">
                                                     <i class="material-icons">school</i> Learn
                                                 </a>
                                             {% endif %}
+                                            <!-- Delete -->
+                                            <br>
+                                            <a class="btn btn-delete-confirm btn-danger btn-lg mt-2"
+                                                data-toggle="modal"
+                                                data-target="#confirmDeleteModal"
+                                                href="{% url 'users:delete_learning_language' learning_language.foreign_language.english_name %}"
+                                                id="btn-delete-{{learning_language.foreign_language.english_name}}"
+                                                role="button">
+                                                <i class="material-icons">delete_forever</i> Delete
+                                            </a>
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
                             
                         </div>
+                    </div>
+                <!-- User has no LearningLanguages -->
+                {% empty %}
+                    <div class="text-center">
+                    {% if profile_user == user %}
+                        You aren't learning any languages yet!
+                        <br>
+                        <a class="btn btn-success btn-lg mt-3" href="{% url 'users:select_a_language' %}">
+                            Select a Language
+                        </a>
+                    {% else %}
+                        <p>{{ profile_user.display_name }} isn't learning any languages yet!</p>
+                    {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -110,4 +136,44 @@
     
 </div>
 
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="confirmDeleteModal" caller-id="" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Delete</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body text-center">
+        <p>Really delete your saved progress with this language?</p>
+        <p>This is permanent and cannot be undone!</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary btn-lg" data-dismiss="modal">
+            <i class="material-icons">close</i> Cancel
+        </button>
+        <button class="btn btn-danger btn-lg" id="btn-delete">
+            <i class="material-icons">delete_forever</i> Delete
+        </button>
+    </div>
+</div>
+</div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(document).on('click', '.btn-delete-confirm', function () {
+        $("#confirmDeleteModal").attr("caller-id", $(this).attr("id"));
+    })
+    
+    $(document).on('click', '#btn-delete', function () {
+        var caller = $("#btn-delete").closest(".modal").attr("caller-id");
+        window.location = $("#".concat(caller)).attr("href");
+    })
+</script>
 {% endblock %}

@@ -19,6 +19,7 @@ def sign_up(request):
             user = authenticate(email=email, password=password)
             login(request, user)
             return redirect('read:my_books')
+
     # Otherwise, just display the form
     # This prevents error messages displaying on first form load where the user hasn't submitted anything yet
     else:
@@ -33,57 +34,38 @@ def sign_up(request):
 
 @login_required
 def profile(request, id):
-    profile_user = get_object_or_404(CustomUser, pk=id)
-    # The PROFILE user's active LearningLanguage
-    active_language = next(
-        (learning_language for learning_language in profile_user.learning.all() if learning_language.is_active==True),
-        None
-    )
-
+    profile_user = get_object_or_404(CustomUser, pk=id) 
     context = {
         'profile_user': profile_user,
-        'learning_languages': profile_user.learning.all(),
-        'active_language': active_language
+        'learning_languages': profile_user.learning_languages.all(),
+        'active_language': profile_user.active_language
     }
     return render(request, 'users/profile.html', context)
 
 
 @login_required
 def select_a_language(request):
-    # The REQUEST user's active LearningLanguage
-    active_language = next(
-        (learning_language for learning_language in request.user.learning.all() if learning_language.is_active==True),
-        None
-    )
-
     context = {
         'foreign_languages': ForeignLanguage.objects.all(),
-        'active_language': active_language
+        'active_language': request.user.active_language
     }
     return render(request, 'users/select-a-language.html', context)
 
 
 @login_required
 def set_active_language(request, english_name):
-    # The REQUEST user's active LearningLanguage
-    active_language = next(
-        (learning_language for learning_language in request.user.learning.all() if learning_language.is_active==True),
-        None
-    )
+    active_language = request.user.active_language
 
-    # Deactivate the LearningLanguage, if there was one
+    # Deactivate the user's active LearningLanguage, if they had one
     if active_language:
         active_language.is_active = False
         active_language.save()
 
     # Check for the requested language among the user's existing LearningLanguages
-    new_language = next(
-        (learning_language for learning_language in request.user.learning.all() if learning_language.foreign_language.english_name==english_name),
-        None
-    )
+    new_language = request.user.learning_language(english_name)
 
     if new_language:
-        # Activate this LearningLanguage, if it existed
+        # If this LearningLanguage exists, activate it
         new_language.is_active = True
     else:
         # Otherwise, create it
@@ -93,4 +75,28 @@ def set_active_language(request, english_name):
         )
     new_language.save()
 
+    # Take the user to their profile
+    return redirect(reverse('users:profile', args=[request.user.id]))
+
+
+@login_required
+def delete_learning_language(request, english_name):
+    # Check for the requested language among the user's existing LearningLanguages
+    delete_language = request.user.learning_language(english_name)
+
+    # If this LearningLanguage exists, check active status and delete it
+    was_active = False
+    if delete_language:
+        if delete_language.is_active:
+            was_active = True
+        delete_language.delete()
+    
+    # If an active LearningLanguage was deleted, activate another existing one if possible
+    if was_active:
+        learning_language = request.user.learning_languages.all().first()
+        if learning_language:
+            learning_language.is_active = True
+            learning_language.save()
+
+    # Take the user to their profile
     return redirect(reverse('users:profile', args=[request.user.id]))

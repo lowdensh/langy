@@ -8,7 +8,7 @@ class LearningLanguageAdmin(admin.ModelAdmin):
     list_display = ('user', 'foreign_language', 'is_active',)
     list_display_links = ('user', 'foreign_language',)
     list_filter = ('foreign_language',)
-    ordering = ('user', '-is_active', 'foreign_language',)
+    ordering = ('user', 'foreign_language',)
 
     # Specific CustomUser instance
     readonly_fields = ['date_started',]

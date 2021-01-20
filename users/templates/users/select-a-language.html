@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Languages | Langy{% endblock %}
+{% block title %}Select a Language | Langy{% endblock %}
 {% load static %}
 
 {% block content %}
@@ -8,7 +8,7 @@
 
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-md-8 text-center">
-            <h1>Languages</h1>
+            <h1>Select a Language</h1>
         </div>
     </div>
 
@@ -65,7 +65,9 @@
                                     </a>
                                 {% else %}
                                     <br>
-                                    <a class="btn btn-learn btn-success btn-lg mt-1" href="{% url 'users:set_active_language' foreign_language.english_name %}" role="button">
+                                    <a class="btn btn-learn btn-success btn-lg mt-1"
+                                        href="{% url 'users:set_active_language' foreign_language.english_name %}"
+                                        role="button">
                                         <i class="material-icons">school</i> Learn
                                     </a>
                                 {% endif %}

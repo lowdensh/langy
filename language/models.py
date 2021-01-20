@@ -30,7 +30,7 @@ class ForeignLanguage(models.Model):
 
 
 class LearningLanguage(models.Model):
-    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='learning')
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='learning_languages')
     foreign_language = models.ForeignKey(to='ForeignLanguage', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     date_started = models.DateTimeField(auto_now_add=True)

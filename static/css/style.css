@@ -11,13 +11,13 @@ a:hover {
     text-decoration: none;
 }
 
-#accordion a {
+#accordion .card-header {
     background-color: #FFF;
 }
-#accordion a:hover {
+#accordion .card-header:hover {
     background-color: #F8F9FA;
 }
-#accordion a:not(.collapsed) {
+#accordion .card-header:not(.collapsed) {
     background-color: #638D2B;
     color: #FFF;
 }
@@ -50,7 +50,8 @@ body {
 }
 
 .container,
-.container-fluid {
+.container-fluid,
+.modal {
     font-size: 1.3em;
     letter-spacing: 0.05em;
 }
