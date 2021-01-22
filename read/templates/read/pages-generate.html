@@ -29,9 +29,9 @@
         </div>
         {% if text_content %}
             <div class="row mt-md-5 mt-4">
-                <div class="col-1 text-center">Page</div>
-                <div class="col-10 text-center"></div>
-                <div class="col-1 text-center">Include?</div>
+                <div class="col-1 text-center font-weight-bold">Page</div>
+                <div class="col-10 text-center font-weight-bold"></div>
+                <div class="col-1 text-center font-weight-bold">Include?</div>
             </div>
             {% for text in text_content %}
                 <div class="row text-content-row mt-3">
@@ -52,7 +52,7 @@
                         <i class="material-icons">close</i> Cancel
                     </a>
                     {% csrf_token %}
-                    <a id="btn-save" class="btn btn-success btn-lg ml-3" role="button">
+                    <a id="btn-save" class="btn btn-success btn-lg ml-2" role="button">
                         <i class="material-icons">save</i> Save
                     </a>
                 </div>
@@ -73,7 +73,7 @@
 
 {% block scripts %}
 <script>
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
 
     $("#btn-save").on("click", function() {
         var rows = $(".text-content-row")

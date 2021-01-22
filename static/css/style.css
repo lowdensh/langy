@@ -106,6 +106,10 @@ a.list-group-item:hover {
     background-color: #F8F9FA;
 }
 
+.row-striped:nth-of-type(odd) {
+    background-color: #F8F9FA;
+}
+
 .su-area {
     background-color: #FFC107;
     border-radius: 5px;

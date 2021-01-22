@@ -1,4 +1,5 @@
 from django.db import models
+from read.models import Book
 from users.models import CustomUser
 
 
@@ -31,7 +32,7 @@ class ForeignLanguage(models.Model):
 
 class LearningLanguage(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='learning_languages')
-    foreign_language = models.ForeignKey(to='ForeignLanguage', on_delete=models.CASCADE)
+    foreign_language = models.ForeignKey(to=ForeignLanguage, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     date_started = models.DateTimeField(auto_now_add=True)
 
@@ -42,23 +43,30 @@ class LearningLanguage(models.Model):
         return f'{self.user}: {self.foreign_language}'
 
 
-class WordCategory(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    class Meta:
-        ordering = ['name']
-        verbose_name_plural = 'Word categories'
-
-    def __str__(self):
-        return self.name
-
-
 class TranslatableWord(models.Model):
     english_word = models.CharField(max_length=50, unique=True)
-    categories = models.ManyToManyField(to='WordCategory')
+    books = models.ManyToManyField(to=Book, related_name='translatable_words')
+
+    @property
+    def book_count(self):
+        return self.books.count()
+
+    @property
+    def is_used(self):
+        if self.book_count == 0:
+            return False
+        return True
 
     class Meta:
         ordering = ['english_word']
 
     def __str__(self):
         return self.english_word
+
+
+class Translation(models.Model):
+    translatable_word = models.ForeignKey(to=TranslatableWord, on_delete=models.CASCADE, related_name='translations')
+    language = models.ForeignKey(to=ForeignLanguage, on_delete=models.CASCADE, related_name='translations')
+    # TODO check whats available from googletrans
+    # native_word
+    # romanisation

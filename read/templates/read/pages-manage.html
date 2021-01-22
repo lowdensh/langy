@@ -40,16 +40,17 @@
         <div class="col text-justify">
             <h3>Generate Pages</h3>
             {% if book.has_pdf %}
-                This book has a PDF to generate pages from. You can edit these before saving.
+                This Book has a PDF to generate Page objects from.
+                You can edit these before saving.
                 {% if book.has_pages %}
-                    Saving new pages will replace the existing ones.
+                    Saving new pages here will replace any existing Pages belonging to this Book.
                 {% endif %}
                 <br>
                 <a class="btn btn-success btn-lg mt-3" href="{% url 'read:pages_generate' book.id %}" role="button">
                     Generate
                 </a>
             {% else %}
-                This book does not have a PDF to generate pages from.
+                This Book does not have a PDF to generate Pages from.
             {% endif %}
         </div>
     </div>
@@ -58,13 +59,14 @@
         <div class="col text-justify">
             <h3>Edit Pages</h3>
             {% if book.has_pages %}
-                This book has {{ book.page_count }} existing pages. These can be edited on the administration website.
+                This Book has {{ book.page_count }} existing Pages.
+                These can be edited on the administration website.
             {% else %}
-                This book does not have any existing pages.
+                This Book does not have any existing Pages.
             {% endif %}
             <br>
             <a class="btn btn-secondary btn-lg mt-3" href="{% url 'admin:read_book_change' book.id %}" role="button" target="_blank">
-                View book on admin site
+                View Book on admin site
             </a>
         </div>
     </div>

@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from googletrans import Translator
-import json, pdfplumber, re
+import json, nltk, pdfplumber, re
+nltk.download('stopwords')
 
 
 @login_required
@@ -119,6 +120,86 @@ def pages_save(request, book_id):
 
     except Exception:
         return HttpResponseBadRequest('Bad request')
+
+
+@login_required
+@staff_member_required
+def words_manage(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+
+    context = {
+        'book': book
+    }
+    return render(request, 'read/words-manage.html', context)
+
+
+@login_required
+@staff_member_required
+def words_generate(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+
+    # One string containing all book text
+    text = ""
+    for page in book.pages.all():
+        text += page.text
+
+    # Separate book text into individual words
+    # Remove punctuation, stopwords, and convert to lowercase
+    words = nltk.tokenize.word_tokenize(text)
+    words = [w.lower() for w in words if w.isalnum()]
+    words = [w for w in words if not w in nltk.corpus.stopwords.words()]
+
+    # Dictionary of unique words and their frequencies
+    fdist = nltk.probability.FreqDist(words)
+    unique_word_count = len(fdist)
+
+    # Get a list of the top n most common words and their frequencies
+    MAX_COMMON_WORDS = 30
+    # List of tuples of the form ('word', frequency)
+    common_words = fdist.most_common(MAX_COMMON_WORDS)
+
+    context = {
+        'book': book,
+        'unique_word_count': unique_word_count,
+        'common_word_count': MAX_COMMON_WORDS,
+        'common_words': common_words
+    }
+    return render(request, 'read/words-generate.html', context)
+
+
+@login_required
+@staff_member_required
+def words_save(request, book_id):
+    if request.method == 'POST':
+        book = get_object_or_404(Book, pk=book_id)
+        json_data = json.loads(request.body)
+        words = json_data['words']
+
+        for word in words:
+            try:
+                # Find the TranslatableWord matching this English word
+                translatable_word = TranslatableWord.objects.get(english_word=word)
+            except TranslatableWord.DoesNotExist:
+                # If it doesn't exist, create it
+                translatable_word = TranslatableWord.objects.create(english_word=word)
+        
+            # Add this Book to the TranslatableWord, if not already added
+            if book not in translatable_word.books.all():
+                translatable_word.books.add(book)
+            
+        return JsonResponse({'success': True})
+
+    else:
+        return HttpResponseBadRequest('Bad request')
+
+
+@login_required
+@staff_member_required
+def words_translate(request, book_id):
+    context = {
+        'book': get_object_or_404(Book, pk=book_id)
+    }
+    return render(request, 'read/words-translate.html', context)
 
 
 @login_required

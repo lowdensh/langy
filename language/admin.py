@@ -1,4 +1,4 @@
-from .models import LearningLanguage, ForeignLanguage, WordCategory, TranslatableWord
+from .models import LearningLanguage, ForeignLanguage, TranslatableWord, Translation
 from django.contrib import admin
 
 
@@ -21,4 +21,17 @@ class ForeignLanguageAdmin(admin.ModelAdmin):
     list_display_links = ('english_name',)
 
 
-admin.site.register([WordCategory, TranslatableWord])
+@admin.register(TranslatableWord)
+class TranslatableWordAdmin(admin.ModelAdmin):
+    # Main list
+    list_display = ('english_word', 'is_used')
+    list_display_links = ('english_word',)
+
+    def is_used(self, instance):
+        return instance.is_used
+
+    is_used.boolean=True
+
+
+# class TranslatableWordInline(admin.TabularInline):
+    # model = Book.translatable_words.through

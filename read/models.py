@@ -1,6 +1,6 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from nltk import tokenize
+from nltk.tokenize import sent_tokenize
 
 
 class Author(models.Model):
@@ -28,7 +28,7 @@ class Author(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=200)
-    author = models.ForeignKey(Author, on_delete=models.SET_DEFAULT, default=1)
+    author = models.ForeignKey(to=Author, on_delete=models.SET_DEFAULT, default=1)
     source_url = models.URLField('Source URL')
     summary = models.TextField(max_length=1000, blank=True)
     cover = models.ImageField(upload_to='book_covers', default='book_covers/default.jpg')
@@ -64,6 +64,16 @@ class Book(models.Model):
         if self.pdf:
             return True
         return False
+
+    @property
+    def translatable_word_count(self):
+        return self.translatable_words.count()
+
+    @property
+    def has_translatable_words(self):
+        if self.translatable_word_count == 0:
+            return False
+        return True
     
     def __str__(self):
         return self.title
@@ -73,7 +83,7 @@ class Book(models.Model):
 
 
 class Page(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='pages')
+    book = models.ForeignKey(to=Book, on_delete=models.CASCADE, related_name='pages')
     number = models.SmallIntegerField()
     text = models.TextField()
     image = models.ImageField(upload_to='book_page_images', blank=True, null=True)
@@ -88,20 +98,21 @@ class Page(models.Model):
 
     @property
     def sentences(self):
-        # NLTK sentence tokenizer
-        return tokenize.sent_tokenize(self.text)
+        # Used for pages with an image
+        # Split page text in half and show image between the two halves
+        return sent_tokenize(self.text)
 
     @property
     def text_half_1(self):
         half = len(self.sentences)//2
         # Join list of sentences (strings) into one, with spaces between
-        # If there is only one sentence, this half is empty
+        # If there is only one sentence, text_half_1 is empty
         return ' '.join(self.sentences[:half])
 
     @property
     def text_half_2(self):
         half = len(self.sentences)//2
-        # If there is only one sentence, this half contains it
+        # If there is only one sentence, text_half_2 contains it
         return ' '.join(self.sentences[half:])
     
     def __str__(self):

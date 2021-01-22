@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Generate Words | Langy{% endblock %}
+
+{% block content %}
+
+<div class="container mt-md-5 mt-4 mb-5">
+
+    <div class="row mt-md-5 mt-4 justify-content-center">
+        <div class="col-8 text-center">
+            <h1>Generate Words</h1>
+            <h2>{{ book.title }}</h2>
+            <span class="su-area">Superuser Area</span>
+        </div>
+    </div>
+
+    <div class="row mt-md-5 mt-4 justify-content-center">
+        <div class="col text-center">
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:words_manage' book.id %}" role="button">
+                <i class="material-icons">close</i> Cancel
+            </a>
+        </div>
+    </div>
+
+    {% if book.has_pages %}
+        <div class="row mt-md-5 mt-4">
+            <div class="col text-justify">
+                Punctuation and stop words have been removed.
+                Words are converted to lower case.
+                This Book contains {{ unique_word_count }} unique words in total.
+                Displayed below are the top {{ common_word_count }} most common unique words.
+            </div>
+        </div>
+        {% if common_words %}
+            <div class="row mt-md-5 mt-4 justify-content-center">
+                <div class="col-md-2 col-2 text-center font-weight-bold">Rank</div>
+                <div class="col-md-3 col-5 text-center font-weight-bold">Word</div>
+                <div class="col-md-2 col-3 text-center font-weight-bold">Frequency</div>
+                <div class="col-md-2 col-2 text-center font-weight-bold">Include?</div>
+            </div>
+            {% for item in common_words %}
+                <div class="row row-striped word-row mt-3 justify-content-center">
+                    <div class="col-md-2 col-2 text-center my-auto">
+                        <!-- Rank -->
+                        {{ forloop.counter }}
+                    </div>
+                    <div class="col-md-3 col-5 text-center my-auto">
+                        <!-- Word -->
+                        <span class="translatable_word">{{ item.0 }}</span>
+                    </div>
+                    <div class="col-md-2 col-3 text-center my-auto">
+                        <!-- Frequency -->
+                        {{ item.1 }}
+                    </div>
+                    <div class="col-md-2 col-2 text-center my-auto">
+                        <!-- Include? -->
+                        <input class="form-control form-control-sm" type="checkbox">
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="row mt-md-5 mt-4 justify-content-center">
+                <div class="col text-center">
+                    <a class="btn btn-secondary btn-lg" href="{% url 'read:words_manage' book.id %}" role="button">
+                        <i class="material-icons">close</i> Cancel
+                    </a>
+                    {% csrf_token %}
+                    <a id="btn-save" class="btn btn-success btn-lg ml-2" role="button">
+                        <i class="material-icons">save</i> Save
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <div class="row mt-md-5 mt-4">
+            <div class="col text-justify">
+                This Book does not have any Pages to generate words from.
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
+$("#btn-save").on("click", function() {
+    var rows = $(".word-row")
+    var include_words = []
+
+    if (rows.length > 0) {
+        rows.each(function() {
+            chk = $(this).find("input[type='checkbox']")
+            word = $(this).find(".translatable_word")
+            if (chk.is(":checked")) {
+                include_words.push(word.text())
+            }
+        })
+    }
+
+    if (include_words.length > 0) {
+        console.log(include_words)
+        $.ajax({
+            method: "POST",
+            url: "{% url 'read:words_save' book.id %}",
+            headers: {"X-CSRFToken": csrftoken},
+            data: JSON.stringify({
+                "words": include_words
+            }),
+            success: function(data, textStatus, jqXHR) {
+                window.location.href = "{% url 'read:words_manage' book.id %}"
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ": " + errorThrown)
+            }
+        })
+    }
+})
+</script>
+{% endblock %}

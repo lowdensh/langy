@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Manage Words | Langy{% endblock %}
+
+{% block content %}
+
+<div class="container mt-md-5 mt-4 mb-5">
+
+    <div class="row mt-md-5 mt-4 justify-content-center">
+        <div class="col-8 text-center">
+            <h1>Manage Words</h1>
+            <h2>{{ book.title }}</h2>
+            <span class="su-area">Superuser Area</span>
+        </div>
+    </div>
+
+    <div class="row mt-md-5 mt-4 justify-content-center">
+        <div class="col text-center">
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:details' book.id %}" role="button">
+                <i class="material-icons">arrow_back</i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row mt-md-5 mt-4">
+        <div class="col text-justify">
+            <h3>Generate Words</h3>
+            {% if book.has_pages %}
+                This Book has Pages to generate TranslatableWord objects from.
+                You can review these before saving.
+                Saving words that already exist as objects will update them.
+                <br>
+                <a class="btn btn-success btn-lg mt-3" href="{% url 'read:words_generate' book.id %}" role="button">
+                    Generate
+                </a>
+            {% else %}
+                This Book does not have any Pages to generate TranslatableWords from.
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-md-5 mt-4">
+        <div class="col text-justify">
+            <h3>Translate Words</h3>
+            {% if book.has_translatable_words %}
+                This Book contains {{ book.translatable_word_count }} existing TranslatableWords.
+                You can get translations and review these before saving them as Translation objects.
+                Saving translations that already exist as objects will update them.
+                <br>
+                <a class="btn btn-success btn-lg mt-3" href="{% url 'read:words_translate' book.id %}" role="button">
+                    Translate
+                </a>
+            {% else %}
+                This Book does not contain any existing TranslatableWords.
+            {% endif %}
+            <br>
+            <a class="btn btn-secondary btn-lg mt-3" href="{% url 'admin:read_book_change' book.id %}" role="button" target="_blank">
+                View Book on admin site
+            </a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

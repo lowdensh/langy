@@ -37,7 +37,8 @@
         <div class="col-lg-8">
             <div id="accordion">
                 {% for learning_language in learning_languages %}
-                    <!-- Card: expanded if this is the profile user's active learning language -->
+                    <!-- One card for each LearningLanguage -->
+                    <!-- Expanded if this is the profile user's active LearningLanguage -->
                     <div class="card">
 
                         <!-- Header -->
@@ -115,7 +116,7 @@
                             
                         </div>
                     </div>
-                <!-- User has no LearningLanguages -->
+                <!-- Profile user has no LearningLanguages -->
                 {% empty %}
                     <div class="text-center">
                     {% if profile_user == user %}

@@ -19,7 +19,7 @@
                 <i class="material-icons">arrow_back</i> Back
             </a>
             {% if book.has_pages %}
-                <a class="btn btn-success btn-lg ml-3" href="{% url 'read:read' book.id %}" role="button">
+                <a class="btn btn-success btn-lg ml-2" href="{% url 'read:read' book.id %}" role="button">
                     <i class="material-icons">menu_book</i> Read!
                 </a>
             {% endif %}
@@ -32,6 +32,9 @@
             <div class="col text-center">
                 <a class="btn btn-warning btn-lg" href="{% url 'read:pages_manage' book.id %}" role="button">
                     Manage Pages
+                </a>
+                <a class="btn btn-warning btn-lg ml-2" href="{% url 'read:words_manage' book.id %}" role="button">
+                    Manage Words
                 </a>
             </div>
         </div>
