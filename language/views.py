@@ -1,4 +1,5 @@
 from .models import ForeignLanguage, TranslatableWord, Translation
+from read.models import Book
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponseServerError, JsonResponse
@@ -9,12 +10,23 @@ import json
 
 @login_required
 @staff_member_required
-def translate_all_words(request):
+def translation_page(request):
     context = {
         'foreign_languages': ForeignLanguage.objects.all(),
         'translatable_words': TranslatableWord.objects.all(),
     }
-    return render(request, 'language/translate-all-words.html', context)
+    return render(request, 'language/translate.html', context)
+
+
+@login_required
+@staff_member_required
+def translation_page_book(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    context = {
+        'foreign_languages': ForeignLanguage.objects.all(),
+        'translatable_words': book.translatable_words.all(),
+    }
+    return render(request, 'language/translate.html', context)
 
 
 @login_required

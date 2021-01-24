@@ -41,11 +41,22 @@
     <div class="row mt-md-5 mt-4">
         <div class="col text-justify">
             <h3>Translate Words</h3>
-            You can get translations for <b>all</b> TranslatableWords here and review these before saving them as Translation objects.
-            Saving translations that already exist as objects will update them.
+            {% if book.has_translatable_words %}
+                This Book contains {{ book.translatable_word_count }} existing TranslatableWords.
+                You can get translations and review these before saving them as Translation objects.
+                Saving translations that already exist as objects will update them.
+                <br>
+                <a class="btn btn-success btn-lg mt-3" href="{% url 'language:translation_page_book' book.id %}" role="button">
+                    Translate for this Book
+                </a>
+            {% else %}
+                This Book does not contain any existing TranslatableWords.
+            {% endif %}
+            <br><br>
+            You can also get translations for <b>all</b> TranslatableWords here.
             <br>
-            <a class="btn btn-success btn-lg mt-3" href="{% url 'language:translate_all_words' %}" role="button">
-                Translate
+            <a class="btn btn-success btn-lg mt-3" href="{% url 'language:translation_page' %}" role="button">
+                Translate for all
             </a>
             <br>
             <a class="btn btn-secondary btn-lg mt-3" href="{% url 'admin:language_translation_changelist' %}" role="button" target="_blank">
