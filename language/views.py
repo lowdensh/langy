@@ -2,9 +2,19 @@ from .models import ForeignLanguage, TranslatableWord, Translation
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponseServerError, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from googletrans import Translator
 import json
+
+
+@login_required
+@staff_member_required
+def translate_all_words(request):
+    context = {
+        'foreign_languages': ForeignLanguage.objects.all(),
+        'translatable_words': TranslatableWord.objects.all(),
+    }
+    return render(request, 'language/translate-all-words.html', context)
 
 
 @login_required

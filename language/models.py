@@ -79,9 +79,13 @@ class Translation(models.Model):
     foreign_language = models.ForeignKey(to=ForeignLanguage, on_delete=models.CASCADE, related_name='translations')
     foreign_word = models.CharField(max_length=50)
     pronunciation = models.CharField(max_length=50, blank=True)
+    last_modified = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['foreign_language', 'translatable_word']
 
     def __str__(self):
-        return f'{self.foreign_language}: {self.translatable_word}'
+        if self.foreign_language.uses_latin_script:
+            return f'({self.foreign_language}) {self.translatable_word} : {self.foreign_word}'
+        else:
+            return f'({self.foreign_language}) {self.translatable_word} : {self.foreign_word} : {self.pronunciation}'

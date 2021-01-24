@@ -29,7 +29,7 @@ class ForeignLanguageAdmin(admin.ModelAdmin):
 @admin.register(TranslatableWord)
 class TranslatableWordAdmin(admin.ModelAdmin):
     # Main list
-    list_display = ('english_word', 'is_used')
+    list_display = ('english_word', 'is_used', 'book_count',)
     list_display_links = ('english_word',)
 
     def is_used(self, instance):
@@ -41,6 +41,9 @@ class TranslatableWordAdmin(admin.ModelAdmin):
 @admin.register(Translation)
 class TranslationAdmin(admin.ModelAdmin):
     # Main list
-    list_display = ('translatable_word', 'foreign_language', 'foreign_word', 'pronunciation')
+    list_display = ('translatable_word', 'foreign_language', 'foreign_word', 'pronunciation',)
     list_display_links = ('translatable_word',)
     list_filter = ('foreign_language',)
+
+    # Specific Translation instance
+    readonly_fields = ['last_modified',]

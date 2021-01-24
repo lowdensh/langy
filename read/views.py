@@ -198,18 +198,6 @@ def words_save(request, book_id):
 
 
 @login_required
-@staff_member_required
-def words_translate(request, book_id):
-    book = get_object_or_404(Book, pk=book_id)
-    context = {
-        'book': book,
-        'foreign_languages': ForeignLanguage.objects.all(),
-        'translatable_words': book.translatable_words.all(),
-    }
-    return render(request, 'read/words-translate.html', context)
-
-
-@login_required
 def read(request, book_id):
     context = {
         'book': get_object_or_404(Book, pk=book_id)

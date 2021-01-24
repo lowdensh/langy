@@ -17,5 +17,4 @@ urlpatterns = [
     path('<int:book_id>/words/manage', views.words_manage, name='words_manage'),
     path('<int:book_id>/words/generate', views.words_generate, name='words_generate'),
     path('<int:book_id>/words/save', views.words_save, name='words_save'),
-    path('<int:book_id>/words/translate', views.words_translate, name='words_translate'),
 ]

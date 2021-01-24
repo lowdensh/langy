@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Translate Words | Langy{% endblock %}
+{% block title %}Translate | Langy{% endblock %}
 
 {% block content %}
 
@@ -7,15 +7,17 @@
 
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-8 text-center">
-            <h1>Translate Words</h1>
-            <h2>{{ book.title }}</h2>
+            <h1>Translate</h1>
             <span class="su-area">Superuser Area</span>
         </div>
     </div>
 
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col text-center">
-            <a class="btn btn-secondary btn-lg" href="{% url 'read:words_manage' book.id %}" role="button">
+            <a class="btn btn-secondary btn-lg" href="{% url 'admin:language_translation_changelist' %}" role="button" target="_blank">
+                View Translations on admin site
+            </a>
+            <a class="btn btn-secondary btn-lg ml-2" href="{% url 'read:my_books' %}" role="button">
                 <i class="material-icons">close</i> Cancel
             </a>
         </div>
@@ -23,88 +25,89 @@
 
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col">
-            {% if translatable_words %}
-                <div id="accordion">
-                    {% csrf_token %}
+            <div id="accordion">
+                {% csrf_token %}
 
-                    {% for foreign_language in foreign_languages %}
-                        <!-- One card for each ForeignLanguage -->
-                        <div class="card">
+                {% for foreign_language in foreign_languages %}
+                    <!-- One card for each ForeignLanguage -->
+                    <div class="card">
 
-                            <!-- Header -->
-                            <a class="card-header collapsed" id="h-{{ foreign_language.english_name }}" data-toggle="collapse" data-target="#c-{{ foreign_language.english_name }}" aria-expanded="false" aria-controls="c-{{ foreign_language.english_name }}">
-                                <img src="{{ foreign_language.flag.url }}" class="mr-3" width="30px">
-                                {{ foreign_language.english_name }}
-                                <i class="material-icons header-check" data-key="{{ foreign_language.key }}">check_circle</i>
-                            </a>
+                        <!-- Header -->
+                        <a class="card-header collapsed" id="h-{{ foreign_language.english_name }}" data-toggle="collapse" data-target="#c-{{ foreign_language.english_name }}" aria-expanded="false" aria-controls="c-{{ foreign_language.english_name }}">
+                            <img src="{{ foreign_language.flag.url }}" class="mr-3" width="30px">
+                            {{ foreign_language.english_name }}
+                            <i class="material-icons header-check" data-key="{{ foreign_language.key }}">check_circle</i>
+                        </a>
 
-                            <!-- Collapse -->
-                            <div id="c-{{ foreign_language.english_name }}" class="collapse" aria-labelledby="h-{{ foreign_language.english_name }}" data-parent="#accordion">
-                            
-                                <!-- Content -->
-                                <div class="card-body">
+                        <!-- Collapse -->
+                        <div id="c-{{ foreign_language.english_name }}" class="collapse" aria-labelledby="h-{{ foreign_language.english_name }}" data-parent="#accordion">
+                        
+                            <!-- Content -->
+                            <div class="card-body">
 
-                                    <!-- Translate button -->
-                                    <div class="row mt-3 justify-content-center">
-                                        <div class="col text-center">
-                                            <button class="btn btn-translations btn-success btn-lg" data-key="{{ foreign_language.key }}">
-                                                Get Translations
-                                                <br>
-                                                <div class="spinner-border text-light mt-2" role="status">
-                                                    <span class="sr-only">Loading...</span>
-                                                </div>
-                                            </button>
-                                        </div>
+                                <!-- Translate button -->
+                                <div class="row mt-3 justify-content-center">
+                                    <div class="col text-center">
+                                        <button class="btn btn-translations btn-success btn-lg" data-key="{{ foreign_language.key }}">
+                                            Get Translations
+                                            <br>
+                                            <div class="spinner-border text-light mt-2" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </button>
                                     </div>
+                                </div>
 
-                                    <!-- Headers -->
-                                    <div class="row mt-4 justify-content-center">
-                                        <div class="col text-center font-weight-bold">English Word</div>
-                                        <div class="col text-center font-weight-bold">Foreign Word</div>
-                                        <div class="col text-center font-weight-bold">Pronunciation</div>
-                                    </div>
+                                <!-- Headers -->
+                                <div class="row mt-4 justify-content-center">
+                                    <div class="col-2 text-center font-weight-bold">TWID</div>
+                                    <div class="col-3 text-center font-weight-bold">English Word</div>
+                                    <div class="col-3 text-center font-weight-bold">Foreign Word</div>
+                                    <div class="col-3 text-center font-weight-bold">Pronunciation</div>
+                                </div>
 
-                                    <!-- Translation rows -->
-                                    {% for translatable_word in translatable_words %}
-                                        <div class="row row-striped translation-row p-1 justify-content-center"
-                                            data-key="{{ foreign_language.key }}"
-                                            data-tw-id="{{ translatable_word.id }}">
+                                <!-- Translation rows -->
+                                {% for translatable_word in translatable_words %}
+                                    <div class="row row-striped translation-row p-1 justify-content-center"
+                                        data-key="{{ foreign_language.key }}"
+                                        data-tw-id="{{ translatable_word.id }}">
 
-                                            <div class="col text-center">
-                                                <!-- English Word -->
-                                                <span class="english-word">{{ translatable_word.english_word }}</span>
-                                            </div>
-                                            <div class="col text-center">
-                                                <!-- Foreign Word -->
-                                                <input class="foreign-word" type="text" disabled></input>
-                                            </div>
-                                            <div class="col text-center">
-                                                <!-- Pronunciation -->
-                                                <input class="pronunciation" type="text" disabled></input>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-
-                                    <!-- Save button -->
-                                    <div class="row mt-4 justify-content-center">
-                                        <div class="col text-center">
-                                            <a class="btn btn-save btn-success btn-lg disabled" role="button" data-key="{{ foreign_language.key }}">
-                                                <i class="material-icons">save</i> Save
+                                        <div class="col-2 text-center">
+                                            <!-- TWID -->
+                                            <a href="{% url 'admin:language_translatableword_change' translatable_word.id %}" target="_blank">
+                                                {{ translatable_word.id }}
                                             </a>
                                         </div>
+                                        <div class="col-3 text-center">
+                                            <!-- English Word -->
+                                            <span class="english-word">{{ translatable_word.english_word }}</span>
+                                        </div>
+                                        <div class="col-3 text-center">
+                                            <!-- Foreign Word -->
+                                            <input class="foreign-word" type="text" disabled></input>
+                                        </div>
+                                        <div class="col-3 text-center">
+                                            <!-- Pronunciation -->
+                                            <input class="pronunciation" type="text" disabled></input>
+                                        </div>
                                     </div>
+                                {% endfor %}
 
+                                <!-- Save button -->
+                                <div class="row mt-4 justify-content-center">
+                                    <div class="col text-center">
+                                        <a class="btn btn-save btn-success btn-lg disabled" role="button" data-key="{{ foreign_language.key }}">
+                                            <i class="material-icons">save</i> Save
+                                        </a>
+                                    </div>
                                 </div>
-                                
+
                             </div>
-
                         </div>
-                    {% endfor %}
+                    </div>
+                {% endfor %}
 
-                </div>
-            {% else %}
-                This Book has no TranslatableWords associated with it.
-            {% endif %}
+            </div>
         </div>
     </div>
 
