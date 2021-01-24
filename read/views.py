@@ -1,6 +1,6 @@
 from .forms import BookPDFForm
 from .models import Book, Page
-from language.models import TranslatableWord
+from language.models import ForeignLanguage, TranslatableWord
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -41,7 +41,6 @@ def details(request, book_id):
 @staff_member_required
 def pages_manage(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-
     context = {
         'book': book,
         'form':  BookPDFForm(instance=book)
@@ -118,6 +117,9 @@ def pages_save(request, book_id):
                 
             return JsonResponse({'success': True})
 
+        else:
+            return HttpResponseBadRequest('Invalid request method')
+
     except Exception:
         return HttpResponseBadRequest('Bad request')
 
@@ -125,10 +127,8 @@ def pages_save(request, book_id):
 @login_required
 @staff_member_required
 def words_manage(request, book_id):
-    book = get_object_or_404(Book, pk=book_id)
-
     context = {
-        'book': book
+        'book': get_object_or_404(Book, pk=book_id)
     }
     return render(request, 'read/words-manage.html', context)
 
@@ -153,15 +153,19 @@ def words_generate(request, book_id):
     fdist = nltk.probability.FreqDist(words)
     unique_word_count = len(fdist)
 
-    # Get a list of the top n most common words and their frequencies
-    MAX_COMMON_WORDS = 30
-    # List of tuples of the form ('word', frequency)
-    common_words = fdist.most_common(MAX_COMMON_WORDS)
+    # List of all unique words and their frequencies
+    # List of tuples of the form ('word', frequency), ordered by most frequent first
+    common_words = fdist.most_common(unique_word_count)
+
+    # Keep a maximum amount of tuples for words which meet a minimum frequency
+    MIN_FREQUENCY = 3
+    MAX_COMMON_WORDS = 50
+    common_words = list(filter(lambda f: f[1] >= MIN_FREQUENCY, common_words))[:MAX_COMMON_WORDS]
 
     context = {
         'book': book,
         'unique_word_count': unique_word_count,
-        'common_word_count': MAX_COMMON_WORDS,
+        'minimum_frequency': MIN_FREQUENCY,
         'common_words': common_words
     }
     return render(request, 'read/words-generate.html', context)
@@ -190,14 +194,17 @@ def words_save(request, book_id):
         return JsonResponse({'success': True})
 
     else:
-        return HttpResponseBadRequest('Bad request')
+        return HttpResponseBadRequest('Invalid request method')
 
 
 @login_required
 @staff_member_required
 def words_translate(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
     context = {
-        'book': get_object_or_404(Book, pk=book_id)
+        'book': book,
+        'foreign_languages': ForeignLanguage.objects.all(),
+        'translatable_words': book.translatable_words.all(),
     }
     return render(request, 'read/words-translate.html', context)
 

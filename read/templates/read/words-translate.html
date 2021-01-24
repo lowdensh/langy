@@ -21,13 +21,215 @@
         </div>
     </div>
 
+    <div class="row mt-md-5 mt-4 justify-content-center">
+        <div class="col">
+            {% if translatable_words %}
+                <div id="accordion">
+                    {% csrf_token %}
+
+                    {% for foreign_language in foreign_languages %}
+                        <!-- One card for each ForeignLanguage -->
+                        <div class="card">
+
+                            <!-- Header -->
+                            <a class="card-header collapsed" id="h-{{ foreign_language.english_name }}" data-toggle="collapse" data-target="#c-{{ foreign_language.english_name }}" aria-expanded="false" aria-controls="c-{{ foreign_language.english_name }}">
+                                <img src="{{ foreign_language.flag.url }}" class="mr-3" width="30px">
+                                {{ foreign_language.english_name }}
+                                <i class="material-icons header-check" data-key="{{ foreign_language.key }}">check_circle</i>
+                            </a>
+
+                            <!-- Collapse -->
+                            <div id="c-{{ foreign_language.english_name }}" class="collapse" aria-labelledby="h-{{ foreign_language.english_name }}" data-parent="#accordion">
+                            
+                                <!-- Content -->
+                                <div class="card-body">
+
+                                    <!-- Translate button -->
+                                    <div class="row mt-3 justify-content-center">
+                                        <div class="col text-center">
+                                            <button class="btn btn-translations btn-success btn-lg" data-key="{{ foreign_language.key }}">
+                                                Get Translations
+                                                <br>
+                                                <div class="spinner-border text-light mt-2" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Headers -->
+                                    <div class="row mt-4 justify-content-center">
+                                        <div class="col text-center font-weight-bold">English Word</div>
+                                        <div class="col text-center font-weight-bold">Foreign Word</div>
+                                        <div class="col text-center font-weight-bold">Pronunciation</div>
+                                    </div>
+
+                                    <!-- Translation rows -->
+                                    {% for translatable_word in translatable_words %}
+                                        <div class="row row-striped translation-row p-1 justify-content-center"
+                                            data-key="{{ foreign_language.key }}"
+                                            data-tw-id="{{ translatable_word.id }}">
+
+                                            <div class="col text-center">
+                                                <!-- English Word -->
+                                                <span class="english-word">{{ translatable_word.english_word }}</span>
+                                            </div>
+                                            <div class="col text-center">
+                                                <!-- Foreign Word -->
+                                                <input class="foreign-word" type="text" disabled></input>
+                                            </div>
+                                            <div class="col text-center">
+                                                <!-- Pronunciation -->
+                                                <input class="pronunciation" type="text" disabled></input>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+
+                                    <!-- Save button -->
+                                    <div class="row mt-4 justify-content-center">
+                                        <div class="col text-center">
+                                            <a class="btn btn-save btn-success btn-lg disabled" role="button" data-key="{{ foreign_language.key }}">
+                                                <i class="material-icons">save</i> Save
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                
+                            </div>
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+            {% else %}
+                This Book has no TranslatableWords associated with it.
+            {% endif %}
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // {% csrf_token %}
-    // const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
+    // Hide loading spinner in all "Get Translations" buttons
+    // This is shown when doing the Ajax request for translations
+    $(".spinner-border").hide()
+
+    // Hide check icon in all card headers
+    // This is shown when Translation objects are saved for a particular card
+    $('.header-check').hide()
+
+    // Scroll to the top of a card in the accordion when it is clicked
+    $('.collapse').on('shown.bs.collapse', function() {
+        var card = $(this).closest('.card')
+        $('html, body').animate({
+            scrollTop: card.offset().top - $("#nav-base").height()*1.5
+        }, 500)
+    })
+
+    $(".btn-translations").on("click", function() {
+        // Find elements
+        var trigger_button = $(this)
+        var key = trigger_button.attr("data-key")
+        var translation_rows = $(`.translation-row[data-key=${key}]`)
+        var save_button = $(`.btn-save[data-key=${key}]`)
+
+        // Build list of English words for request
+        var english_words = []
+        if (translation_rows.length > 0) {
+            translation_rows.each(function() {
+                english_words.push($(this).find(".english-word").text())
+            })
+        }
+
+        if (english_words.length > 0) {
+            // Loading state: true
+            var loading = trigger_button.find(".spinner-border")
+            loading.show("fast")
+            trigger_button.prop("disabled", true)
+
+            $.ajax({
+                method: "POST",
+                url: ("{% url 'language:translate_english_words' 0 %}").replace(0, key),
+                headers: {"X-CSRFToken": csrftoken},
+                data: JSON.stringify({
+                    "english_words": english_words
+                }),
+                success: function(data, textStatus, jqXHR) {
+                    // Loading state: false
+                    loading.hide("fast")
+                    trigger_button.prop("disabled", false)
+
+                    // Adjust state of elements
+                    save_button.removeClass("disabled")
+                    trigger_button.prop("disabled", true)
+                    $(translation_rows.find(".foreign-word")).prop("disabled", false)
+                    if (data.enable_pronunciations) {
+                        $(translation_rows.find(".pronunciation")).prop("disabled", false)
+                    }
+
+                    // Fill rows with translation data
+                    foreign_words = data.foreign_words
+                    pronunciations = data.pronunciations
+                    translation_rows.each(function(i) {
+                        $(this).find(".foreign-word").val(foreign_words[i])
+                        $(this).find(".pronunciation").val(pronunciations[i])
+                    })
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    // Loading state: false
+                    loading.hide("fast")
+                    trigger_button.prop("disabled", false)
+
+                    alert(textStatus + ": " + errorThrown)
+                }
+            })
+        }
+    })
+
+    $(".btn-save").on("click", function() {
+        // Find elements
+        var trigger_button = $(this)
+        var key = trigger_button.attr("data-key")
+        var translation_rows = $(`.translation-row[data-key=${key}]`)
+
+        // Build list of translations for request
+        var translations = []
+        translation_rows.each(function() {
+            translation = {
+                translatable_word_id: $(this).attr("data-tw-id"),
+                foreign_word: $(this).find(".foreign-word").val(),
+                pronunciation: $(this).find(".pronunciation").val()
+            }
+            translations.push(translation)
+        })
+
+        if (translations.length > 0) {
+            $.ajax({
+                method: "POST",
+                url: ("{% url 'language:save_translations' 0 %}").replace(0, key),
+                headers: {"X-CSRFToken": csrftoken},
+                data: JSON.stringify({
+                    "translations": translations
+                }),
+                success: function(data, textStatus, jqXHR) {
+                    // Adjust state of elements
+                    $(`.header-check[data-key=${key}]`).show()
+                    trigger_button.html('<i class="material-icons">check</i> Saved')
+                    trigger_button.addClass("disabled")
+                    translation_rows.find(".foreign-word").prop("disabled", true)
+                    translation_rows.find(".pronunciation").prop("disabled", true)
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert(textStatus + ": " + errorThrown)
+                }
+            })
+        }
+    })
 </script>
 {% endblock %}

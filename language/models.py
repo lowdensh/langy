@@ -7,27 +7,37 @@ class ForeignLanguage(models.Model):
     key = models.CharField(
         max_length=5,
         help_text=('ISO-639-1 language codes for supported languages for translation. See <a '
-            'href="https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages">googletrans.LANGUAGES</a>.')
+            'href="https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages">googletrans.LANGUAGES</a>.'
+        )
     )
     english_name = models.CharField(max_length=20)
-    native_name = models.CharField(max_length=20)
+    foreign_name = models.CharField(max_length=20)
     note = models.CharField(max_length=20, blank=True)
+    flag = models.ImageField(upload_to='language_flags')
+    uses_latin_script = models.BooleanField(
+        'Uses Latin script',
+        default=True,
+        help_text=('The English language uses Latin script, an Alphabetical <a '
+            'href="https://en.wikipedia.org/wiki/Writing_system"> writing system</a>.<br>'
+            'Ensure this field is False for languages which use different scripts (e.g. Russian: Cyrillic) or systems (e.g. Japanese: Kana, Kanji).'
+        )
+    )
     duolingo_learners = models.PositiveIntegerField(
         help_text=('The amount of learners this language course has on Duolingo. See <a '
-            'href="https://www.duolingo.com/courses">Duolingo Courses</a>.')
+            'href="https://www.duolingo.com/courses">Duolingo Courses</a>.'
+        )
     )
-    flag = models.ImageField(upload_to='language_flags')
+
+    @property
+    def popularity(self):
+        # A measure of how popular a language is to learn
+        return int(self.duolingo_learners/1000)
 
     class Meta:
         ordering = ['english_name']
 
     def __str__(self):
         return self.english_name
-
-    @property
-    def popularity(self):
-        # A measure of how popular a language is to learn
-        return int(self.duolingo_learners/1000)
 
 
 class LearningLanguage(models.Model):
@@ -66,7 +76,12 @@ class TranslatableWord(models.Model):
 
 class Translation(models.Model):
     translatable_word = models.ForeignKey(to=TranslatableWord, on_delete=models.CASCADE, related_name='translations')
-    language = models.ForeignKey(to=ForeignLanguage, on_delete=models.CASCADE, related_name='translations')
-    # TODO check whats available from googletrans
-    # native_word
-    # romanisation
+    foreign_language = models.ForeignKey(to=ForeignLanguage, on_delete=models.CASCADE, related_name='translations')
+    foreign_word = models.CharField(max_length=50)
+    pronunciation = models.CharField(max_length=50, blank=True)
+
+    class Meta:
+        ordering = ['foreign_language', 'translatable_word']
+
+    def __str__(self):
+        return f'{self.foreign_language}: {self.translatable_word}'

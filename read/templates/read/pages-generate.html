@@ -90,7 +90,6 @@
         }
 
         if (include_text_content.length > 0) {
-            console.log(include_text_content)
             $.ajax({
                 method: "POST",
                 url: "{% url 'read:pages_save' book.id %}",

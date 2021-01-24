@@ -17,8 +17,13 @@ class LearningLanguageAdmin(admin.ModelAdmin):
 @admin.register(ForeignLanguage)
 class ForeignLanguageAdmin(admin.ModelAdmin):
     # Main list
-    list_display = ('key', 'english_name', 'native_name', 'note', 'popularity',)
+    list_display = ('key', 'english_name', 'foreign_name', 'note', 'uses_latin_script', 'popularity',)
     list_display_links = ('english_name',)
+
+    def uses_latin_script(self, instance):
+        return instance.uses_latin_script
+
+    uses_latin_script.boolean=True
 
 
 @admin.register(TranslatableWord)
@@ -33,5 +38,9 @@ class TranslatableWordAdmin(admin.ModelAdmin):
     is_used.boolean=True
 
 
-# class TranslatableWordInline(admin.TabularInline):
-    # model = Book.translatable_words.through
+@admin.register(Translation)
+class TranslationAdmin(admin.ModelAdmin):
+    # Main list
+    list_display = ('translatable_word', 'foreign_language', 'foreign_word', 'pronunciation')
+    list_display_links = ('translatable_word',)
+    list_filter = ('foreign_language',)

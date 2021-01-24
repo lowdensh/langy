@@ -27,18 +27,22 @@
                 Punctuation and stop words have been removed.
                 Words are converted to lower case.
                 This Book contains {{ unique_word_count }} unique words in total.
-                Displayed below are the top {{ common_word_count }} most common unique words.
+                Below are the most common words which occur at least {{ minimum_frequency }} times.
             </div>
         </div>
         {% if common_words %}
+
+            <!-- Headers -->
             <div class="row mt-md-5 mt-4 justify-content-center">
                 <div class="col-md-2 col-2 text-center font-weight-bold">Rank</div>
                 <div class="col-md-3 col-5 text-center font-weight-bold">Word</div>
                 <div class="col-md-2 col-3 text-center font-weight-bold">Frequency</div>
                 <div class="col-md-2 col-2 text-center font-weight-bold">Include?</div>
             </div>
+
+            <!-- Word rows -->
             {% for item in common_words %}
-                <div class="row row-striped word-row mt-3 justify-content-center">
+                <div class="row row-striped word-row p-1 justify-content-center">
                     <div class="col-md-2 col-2 text-center my-auto">
                         <!-- Rank -->
                         {{ forloop.counter }}
@@ -57,6 +61,8 @@
                     </div>
                 </div>
             {% endfor %}
+
+            <!-- Action buttons -->
             <div class="row mt-md-5 mt-4 justify-content-center">
                 <div class="col text-center">
                     <a class="btn btn-secondary btn-lg" href="{% url 'read:words_manage' book.id %}" role="button">
@@ -101,7 +107,6 @@ $("#btn-save").on("click", function() {
     }
 
     if (include_words.length > 0) {
-        console.log(include_words)
         $.ajax({
             method: "POST",
             url: "{% url 'read:words_save' book.id %}",

@@ -58,12 +58,12 @@
                 <span class="su-area">Superuser Area</span>
                 
                 {% if books_unreadable %}
-                    <p>The following books have no pages:</p>
+                    <p>The following Books have no Pages:</p>
                     {% for book in books_unreadable %}
                         <h1 class="mb-3"><a href="{% url 'read:details' book.id %}">{{ book.title }}</a></h1>
                     {% endfor %}
                 {% else %}
-                    <p>There are no unreadable books. All books have pages! :)</p>
+                    <p>There are no unreadable Books. All Books have Pages! :)</p>
                 {% endif %}
 
             </div>
