@@ -199,70 +199,40 @@ def words_save(request, book_id):
 
 @login_required
 def read(request, book_id):
-    context = {
-        'book': get_object_or_404(Book, pk=book_id)
-    }
-    return render(request, 'read/read.html', context)
-
-
-# wip read functionality
-@login_required
-def read_wip(request):
-    # change this in urls.py too
-    book_id = 1
-
-    # TODO where should translations be done and stored?
-    # user account section when selecting learning language? translations fetched on language selection?
-    # TODO translation for plurals
-    # plurals are not stored in the database - yet!
-    # TODO direct translation of single words vs word in the context of the whole sentence - NLP?
-    # as it stands, translation is for single words and this means things are sometimes incorrect
-    # e.g. genders, word order etc.
-
-    # https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages
-    learning_language = 'sv'
-
-    english_word_list = TranslatableWord.objects.all()
-    english_word_list = [word.english_word for word in english_word_list]
-    translator = Translator()
-    foreign_word_list = translator.translate(
-        english_word_list,
-        src='en',
-        dest=learning_language)
-
-    # TODO how and where should book text be stored?
-    file_path = 'static/books/monkeypen/002-GINGER-THE-GIRAFFE-Free-Childrens-Book-By-Monkey-Pen-unlocked.txt'
-    file_text = open(file_path, encoding='utf8', errors='ignore').read()
-
-    # TODO efficiency of search/replace
-    # go through every word in word_list? or file_text?
-    # time complexity of search/replace
-    for i, english_word in enumerate(english_word_list):
-        foreign_word = foreign_word_list[i].text
-        pattern = re.compile(rf'(?<![^\W]){english_word}(?![^\W])', re.I)
-        replacement = f'<button class="tappyWord"> {foreign_word} <span> {english_word} </span></button>'
-        file_text = re.sub(pattern, replacement, file_text)
-
-    # TODO should text be large paragraphs or short sentences?
-    # text file into paragraphs
-    paragraph_list = file_text.split('\n\n')
-    paragraph_list = [paragraph.replace('\n', ' ') for paragraph in paragraph_list]
-
-    # text file into paragraphs into sentences - rudimentary splitting
-    # paragraph_list = file_text.split('\n\n')
-    # paragraph_list = [paragraph.replace('\n', ' ') for paragraph in paragraph_list]
-    # sentence_list = []
-    # for paragraph in paragraph_list:
-    #     sentences = paragraph.split('. ')
-    #     for s in sentences:
-    #         sentence_list.append(s + '.')
-
-    template = 'read/read-wip.html'
     book = get_object_or_404(Book, pk=book_id)
+
+    # Get the user's active LearningLanguage and appropriate Translations
+    foreign_language = request.user.active_language.foreign_language
+    translations = [tw.translation(foreign_language) for tw in book.translatable_words.all()]
+
+    # Build a list of Page text to be manipulated
+    page_text_html = [page.text for page in book.pages.all()]
+
+    # Find and replace whole English words with interactable HTML
+    for t in translations:
+        pattern = rf'\b{t.translatable_word.english_word}\b'
+
+        if foreign_language.uses_latin_script:
+            replacement = f'<button class="tappyWord">{t.foreign_word}<span>{t.translatable_word.english_word}</span></button>'
+        else:
+            replacement = f'<button class="tappyWord">{t.pronunciation}<span>{t.translatable_word.english_word}</span></button>'
+        
+        # Perform replacement for each Page
+        for i, pt in enumerate(page_text_html): 
+            page_text_html[i] = re.sub(pattern, replacement, pt, flags=re.IGNORECASE)
+
+    # Build Page-like dicts for use in the template
+    pages = []
+    for i, pt in enumerate(page_text_html):
+        page = {
+            'number': i+1,
+            'sentences': nltk.tokenize.sent_tokenize(page_text_html[i]),
+            'image': book.pages.get(number=i+1).image
+        }
+        pages.append(page)
+
     context = {
         'book': book,
-        'author_name': book.author.full_name,
-        'word_list': english_word_list,
-        'paragraph_list': paragraph_list
+        'pages': pages
     }
-    return render(request, template, context)
+    return render(request, 'read/read.html', context)

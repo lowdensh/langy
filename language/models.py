@@ -67,6 +67,11 @@ class TranslatableWord(models.Model):
             return False
         return True
 
+    # Get the Translation for a given ForeignLanguage
+    # Returns None if it does not exist
+    def translation(self, foreign_language):
+        return self.translations.filter(foreign_language = foreign_language).first()
+
     class Meta:
         ordering = ['english_word']
 

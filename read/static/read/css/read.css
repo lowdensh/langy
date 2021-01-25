@@ -63,7 +63,7 @@ html, body, #pages {
 }
 .page-image {
     height: 300px;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 .page-image img {
     background-color: #e6f1dd;
@@ -79,8 +79,9 @@ html, body, #pages {
     font-size: 1.5em;
     letter-spacing: 0.1em;
     line-height: 1.8em;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     overflow-wrap: break-word;
+    padding: 1rem;
 }
 @media only screen and (max-width: 767px) {
     /* smaller than Bootstrap Medium */
@@ -89,15 +90,15 @@ html, body, #pages {
         scroll-margin: 1rem;
     }
     .page-image {
-        height: 100%;
+        height: unset;
         margin-bottom: 1rem;
-        max-height: 300px;
     }
     .page-text {
         font-size: 1.2em;
         letter-spacing: 0.05em;
         line-height: 1.6em;
         margin-bottom: 1rem;
+        padding: 0.5rem;
     }
 }
 

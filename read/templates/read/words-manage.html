@@ -41,6 +41,8 @@
     <div class="row mt-md-5 mt-4">
         <div class="col text-justify">
             <h3>Translate Words</h3>
+
+            <!-- Book-specific -->
             {% if book.has_translatable_words %}
                 This Book contains {{ book.translatable_word_count }} existing TranslatableWords.
                 You can get translations and review these before saving them as Translation objects.
@@ -52,6 +54,8 @@
             {% else %}
                 This Book does not contain any existing TranslatableWords.
             {% endif %}
+            
+            <!-- All -->
             <br><br>
             You can also get translations for <b>all</b> TranslatableWords here.
             <br>

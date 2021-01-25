@@ -1,6 +1,5 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from nltk.tokenize import sent_tokenize
 
 
 class Author(models.Model):
@@ -95,25 +94,6 @@ class Page(models.Model):
             return f'{self.text}'
         else:
             return f'{self.text[0:max_length]}...'
-
-    @property
-    def sentences(self):
-        # Used for pages with an image
-        # Split page text in half and show image between the two halves
-        return sent_tokenize(self.text)
-
-    @property
-    def text_half_1(self):
-        half = len(self.sentences)//2
-        # Join list of sentences (strings) into one, with spaces between
-        # If there is only one sentence, text_half_1 is empty
-        return ' '.join(self.sentences[:half])
-
-    @property
-    def text_half_2(self):
-        half = len(self.sentences)//2
-        # If there is only one sentence, text_half_2 contains it
-        return ' '.join(self.sentences[half:])
     
     def __str__(self):
         return f'{self.book}, pg. {self.number} ({self.text_snippet})'

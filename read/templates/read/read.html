@@ -20,18 +20,15 @@
 <div id="pages">
     <div class="container-fluid h-100">
         <div class="row h-100 justify-content-center">
-            <div class="col-lg-10 col-md-11 col-12 my-auto text-center">
-                {% for page in book.pages.all %}
+            <div class="col-lg-9 col-md-10 col-12 my-auto text-center">
+                {% for page in pages %}
                     <div id="{{ page.number }}" class="page">
                         {% if page.image %}
-                            <!-- If the page has an image, display it between halves of page text -->
-                            <div class="page-text p-3">{{ page.text_half_1 }}</div>
                             <div class="page-image"><img src="{{ page.image.url }}"></div>
-                            <div class="page-text p-3">{{ page.text_half_2 }}</div>
-                        {% else %}
-                            <!-- Otherwise, just display the full page text together -->
-                            <div class="page-text p-3">{{ page.text }}</div>
                         {% endif %}
+                        {% for sentence in page.sentences %}
+                            <div class="page-text">{{ sentence|safe }}</div>
+                        {% endfor %}
                     </div>
                 {% endfor %}
             </div>
