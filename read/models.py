@@ -74,6 +74,17 @@ class Book(models.Model):
             return False
         return True
     
+    # Returns a list of Translations for TranslatableWords used by this Book for a given ForeignLanguage
+    def available_translations(self, foreign_language):
+        return [
+            tw.translation(foreign_language) for tw in self.translatable_words.all()
+            if tw.translation(foreign_language) is not None
+        ]
+
+    # Returns an int for the amount of words that can be learned from this Book for a given ForeignLanguage
+    def words_to_learn(self, foreign_language):
+        return len(self.available_translations)
+    
     def __str__(self):
         return self.title
 

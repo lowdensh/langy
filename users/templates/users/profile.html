@@ -6,6 +6,8 @@
 
 <div class="container mb-md-5 mb-4">
 
+    {% include "users/active-language-check.html" %}
+
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-md-8 text-center">
             <h1>{{ profile_user.display_name }}</h1>
@@ -121,6 +123,8 @@
                     <div class="text-center">
                     {% if profile_user == user %}
                         You aren't learning any languages yet!
+                        <br>
+                        When you are, your progress will be shown here.
                         <br>
                         <a class="btn btn-success btn-lg mt-3" href="{% url 'users:select_a_language' %}">
                             Select a Language

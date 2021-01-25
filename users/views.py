@@ -18,7 +18,7 @@ def sign_up(request):
             password = form.cleaned_data.get('password1')
             user = authenticate(email=email, password=password)
             login(request, user)
-            return redirect('read:my_books')
+            return redirect('read:books')
 
     # Otherwise, just display the form
     # This prevents error messages displaying on first form load where the user hasn't submitted anything yet

@@ -4,7 +4,7 @@ from django.urls import path
 
 app_name = 'read'
 urlpatterns = [
-    path('my-books', views.my_books, name='my_books'),
+    path('books', views.books, name='books'),
 
     path('<int:book_id>/details', views.details, name='details'),
     path('<int:book_id>', views.read, name='read'),

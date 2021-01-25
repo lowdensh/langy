@@ -5,6 +5,8 @@
 
 <div class="container mt-md-5 mt-4 mb-5">
 
+    {% include "users/active-language-check.html" %}
+
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-md-8 text-center">
             <h1>{{ book.title }}</h1>
@@ -15,7 +17,7 @@
     <!-- Actions (All Users) -->
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col text-center">
-            <a class="btn btn-secondary btn-lg" href="{% url 'read:my_books' %}" role="button">
+            <a class="btn btn-secondary btn-lg" href="{% url 'read:books' %}" role="button">
                 <i class="material-icons">arrow_back</i> Back
             </a>
             {% if book.has_pages %}

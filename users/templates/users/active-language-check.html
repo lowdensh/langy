@@ -1,0 +1,6 @@
+{% if not user.active_language %}
+    <div class="alert alert-danger text-center mt-md-5 mt-4" role="alert">
+        You have no active language!
+        <br>Please <a href="{% url 'users:select_a_language' %}">select a language</a> to learn.
+    </div>
+{% endif %}

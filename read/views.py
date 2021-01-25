@@ -4,14 +4,15 @@ from language.models import ForeignLanguage, TranslatableWord
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from googletrans import Translator
 import json, nltk, pdfplumber, re
+from django.urls import reverse
 nltk.download('stopwords')
 
 
 @login_required
-def my_books(request):
+def books(request):
     books = Book.objects.all()
     books_readable = []
     books_unreadable = []
@@ -26,7 +27,7 @@ def my_books(request):
         'books_readable': books_readable,
         'books_unreadable': books_unreadable
     }
-    return render(request, 'read/my-books.html', context)
+    return render(request, 'read/books.html', context)
 
 
 @login_required
@@ -199,11 +200,15 @@ def words_save(request, book_id):
 
 @login_required
 def read(request, book_id):
+    # User must have an active LearningLanguage to be able to read Books
+    if request.user.active_language is None:
+        return redirect('users:select_a_language')
+
     book = get_object_or_404(Book, pk=book_id)
 
     # Get the user's active LearningLanguage and appropriate Translations
     foreign_language = request.user.active_language.foreign_language
-    translations = [tw.translation(foreign_language) for tw in book.translatable_words.all()]
+    translations = book.available_translations(foreign_language)
 
     # Build a list of Page text to be manipulated
     page_text_html = [page.text for page in book.pages.all()]
