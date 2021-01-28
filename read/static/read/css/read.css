@@ -57,6 +57,35 @@ html, body, #pages {
 #pages {
     overflow-y: auto;
 }
+
+.btn-word {
+    font-size: unset;
+    margin-bottom: 0.2rem;
+    padding: 0 0.5rem 0.2rem 0.5rem;
+}
+.popover {
+    min-width: 150px;
+}
+.popover-header {
+    background-color: #638D2B;
+    color: #fff;
+    font-family: "Mali", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-size: 1.5em;
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+.popover-body {
+    font-family: "Mali", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-size: 1.5em;
+    line-height: 2rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+.popover-body hr {
+    margin-block-start: 0.4em;
+    margin-block-end: 0.4em;
+}
+
 .page {
     margin-top: 3rem;
     scroll-margin: 3rem;

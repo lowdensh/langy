@@ -218,9 +218,21 @@ def read(request, book_id):
         pattern = rf'\b{t.translatable_word.english_word}\b'
 
         if foreign_language.uses_latin_script:
-            replacement = f'<button class="tappyWord">{t.foreign_word}<span>{t.translatable_word.english_word}</span></button>'
+            # Visible word    : t.foreign_word
+            # Popover content : t.foreign_word
+            replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
+                                f'title="{t.translatable_word.english_word}"'
+                                f'data-content="{t.foreign_word}">'
+                                f'<a tabindex="0" class="btn btn-success btn-word" role="button">{t.foreign_word}</a>'
+                            '</span>')
         else:
-            replacement = f'<button class="tappyWord">{t.pronunciation}<span>{t.translatable_word.english_word}</span></button>'
+            # Visible word    : t.pronunciation
+            # Popover content : t.pronunciation AND t.foreign_word
+            replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
+                                f'title="{t.translatable_word.english_word}"'
+                                f'data-content="{t.pronunciation} <br> {t.foreign_word}">'
+                                f'<a tabindex="0" class="btn btn-success btn-word" role="button">{t.pronunciation}</a>'
+                            '</span>')
         
         # Perform replacement for each Page
         for i, pt in enumerate(page_text_html): 

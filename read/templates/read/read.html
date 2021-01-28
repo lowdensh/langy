@@ -69,31 +69,35 @@
     var current_page = 1
     var last_page = "{{ book.page_count }}"
 
+    // Initialise popovers
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+    })
+    // Popover dismiss on next click
+    $('.popover-dismiss').popover({
+        trigger: 'focus'
+    })
+
+    // On page load:
+    changeDisplayedPage()
+    changePagesHeight()
+
+    // On window resize:
+    window.onresize = function() {changePagesHeight()}
+
+    // Resize the container with the scrollbar which includes Book images and text
     function changePagesHeight() {
         var bars_height = $("#bar-top").outerHeight(true) + $("#bar-bottom").outerHeight(true)
         $("#pages").height($(window).height() - bars_height)
     }
 
-    function nextPage() {
-        if (current_page < last_page) {
-            current_page++
-            changeDisplayedPage()
-        }
-    }
-
-    function prevPage() {
-        if (current_page > 1) {
-            current_page--
-            changeDisplayedPage()
-        }
-    }
-
+    // Show a different Page of the Book
     function changeDisplayedPage() {
         // Hide all pages
         $(".page").css("display", "none")
-        // Show current page
+
+        // Show current page and go to the top
         $("#" + current_page).show()
-        // Go to the top of the current page
         document.getElementById(current_page).scrollIntoView()
 
         // Disable buttons based on the current page
@@ -111,27 +115,41 @@
         $(".progress-bar").text(current_page + "/" + last_page)
     }
 
-    // On page load
-    changeDisplayedPage()
-    changePagesHeight()
+    function nextPage() {
+        if (current_page < last_page) {
+            current_page++
+            changeDisplayedPage()
+        }
+    }
 
-    // On window resize
-    window.onresize = function() {changePagesHeight()}
+    function prevPage() {
+        if (current_page > 1) {
+            current_page--
+            changeDisplayedPage()
+        }
+    }
 
     // When user wants to change page with buttons or left/right arrow keys
+    // Buttons
     $("#btn-page-next").on("click", function() {nextPage()})
     $("#btn-page-prev").on("click", function() {prevPage()})
+    // Keys
     $(document).keydown(function(e) {
-        // Next page: right arrow key
+        // Right arrow key: use next page button
         if (e.key == "ArrowRight") {
             $("#btn-page-next").focus()
             $("#btn-page-next").click()
         }
-        // Previous page: left arrow key
+        // Left arrow key: use previous page button
         else if (e.key == "ArrowLeft") {
             $("#btn-page-prev").focus()
             $("#btn-page-prev").click()
         }
+    })
+
+    $(".btn-word").on("click", function() {
+        // Adjust styling: from button to link appearance
+        $(this).css({"background":"transparent", "color":"#638D2B", "border":"1px solid transparent"})
     })
 
 </script>
