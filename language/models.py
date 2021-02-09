@@ -94,3 +94,67 @@ class Translation(models.Model):
             return f'({self.foreign_language}) {self.translatable_word} : {self.foreign_word}'
         else:
             return f'({self.foreign_language}) {self.translatable_word} : {self.foreign_word} : {self.pronunciation}'
+    
+
+class LearningTracking(models.Model):
+    # Tracking
+    user = models.ForeignKey(to=CustomUser, null=True, on_delete=models.SET_NULL, related_name='learning_tracking')
+    translation = models.ForeignKey(to=Translation, on_delete=models.CASCADE, related_name='learning_tracking')
+
+    # Interaction
+    time = models.DateTimeField(
+        help_text='Time when the user interacted with this word',
+        auto_now_add=True)
+    prev = models.ForeignKey(
+        help_text='Previous interaction <b>(LearningTracking object)</b> the user had with this word, if any',
+        to='self',
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE)
+
+    # Statistics
+    read_count = models.PositiveIntegerField(
+        help_text='Total times the user has interacted with this word during <b>reading</b>',
+        default=0)
+    test_count = models.PositiveIntegerField(
+        help_text='Total times the user has interacted with this word during <b>testing</b>',
+        default=0)
+    test_correct = models.PositiveIntegerField(
+        help_text='Total times the user has <b>correctly</b> translated this word during <b>testing</b>',
+        default=0)
+
+    # Formatted time
+    # e.g. 2021-02-09 15:02:51
+    @property
+    def ftime(self):
+        return self.time.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Key for this word's foreign language
+    @property
+    def lang_key(self):
+        return self.translation.foreign_language.key
+
+    # Romanised word
+    @property
+    def word(self):
+        if (not self.translation.foreign_language.uses_latin_script
+            and self.translation.pronunciation):
+                return self.translation.pronunciation
+        return self.translation.foreign_word
+
+    # Proportion of tests where the user has correctly translated this word
+    @property
+    def p_trans(self):
+        if test_count == 0:
+            return 0
+        return test_correct / test_count
+
+    class Meta:
+        # Oldest first
+        ordering = ['time']
+        verbose_name = ' Learning Tracking'
+        verbose_name_plural = ' Learning Tracking'
+
+    # Formatted time and romanised word
+    def __str__(self):
+        return f'{self.ftime} ({self.word})'

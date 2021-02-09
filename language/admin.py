@@ -1,4 +1,4 @@
-from .models import LearningLanguage, ForeignLanguage, TranslatableWord, Translation
+from .models import LearningLanguage, ForeignLanguage, TranslatableWord, Translation, LearningTracking
 from django.contrib import admin
 
 
@@ -47,3 +47,26 @@ class TranslationAdmin(admin.ModelAdmin):
 
     # Specific Translation instance
     readonly_fields = ['last_modified',]
+
+
+@admin.register(LearningTracking)
+class LearningTrackingAdmin(admin.ModelAdmin):
+    # Main list
+    list_display = ('uid', 'language', 'word', 'ftime', 'prev', 'read_count', 'test_count', 'test_correct',)
+    list_display_links = ('ftime',)
+    list_filter = ('user',)
+
+    # Specific Translation instance
+    fieldsets = (
+        ('Tracking', {'fields': ('user', 'translation',)}),
+        ('Interaction', {'fields': ('time', 'prev',)}),
+        ('Statistics', {'fields': ('read_count', 'test_count', 'test_correct',)}),
+    )
+    readonly_fields = ['time',]
+
+    def uid(self, obj):
+        return obj.user.id
+
+    def language(self, obj):
+        return obj.lang_key
+    language.short_description = 'Language'

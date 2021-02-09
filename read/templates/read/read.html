@@ -11,8 +11,8 @@
 <nav id="bar-top" class="navbar sticky-top navbar-dark bg-forest">
     <span class="navbar-brand h1 mb-0">{{ book.title }}</span>
     <div class="navbar-nav ml-auto">
-        <a class="nav-item nav-link" href="{% url 'read:details' book.id %}">
-            Quit <i class="material-icons">close</i>
+        <a class="nav-item nav-link" href="{% url 'read:close_book' book.id %}">
+            <span class="d-none d-sm-inline">Close Book</span> <i class="material-icons">close</i>
         </a>
     </div>
 </nav>
@@ -21,6 +21,7 @@
     <div class="container-fluid h-100">
         <div class="row h-100 justify-content-center">
             <div class="col-lg-9 col-md-10 col-12 my-auto text-center">
+                {% csrf_token %}
                 {% for page in pages %}
                     <div id="{{ page.number }}" class="page">
                         {% if page.image %}
@@ -66,6 +67,7 @@
 
 {% block scripts %}
 <script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
     var current_page = 1
     var last_page = "{{ book.page_count }}"
 
@@ -129,7 +131,7 @@
         }
     }
 
-    // When user wants to change page with buttons or left/right arrow keys
+    // User wants to change page with buttons or left/right arrow keys
     // Buttons
     $("#btn-page-next").on("click", function() {nextPage()})
     $("#btn-page-prev").on("click", function() {prevPage()})
@@ -147,9 +149,26 @@
         }
     })
 
+    // User interacted with a TranslatableWord
     $(".btn-word").on("click", function() {
         // Adjust styling: from button to link appearance
+        // Indicate this has been clicked on before
         $(this).css({"background":"transparent", "color":"#638D2B", "border":"1px solid transparent"})
+
+        // Track Translation in session
+        var translation_id = $(this).parent().attr("data-translation-id")
+        $.ajax({
+            method: "POST",
+            url: "{% url 'read:session_tracking' %}",
+            headers: {"X-CSRFToken": csrftoken},
+            data: JSON.stringify({
+                    "translation_id": translation_id
+            }),
+            success: function(data, textStatus, jqXHR) {},
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ": " + errorThrown)
+            }
+        })
     })
 
 </script>

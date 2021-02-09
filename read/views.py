@@ -1,6 +1,6 @@
 from .forms import BookPDFForm
 from .models import Book, Page
-from language.models import ForeignLanguage, TranslatableWord
+from language.models import ForeignLanguage, TranslatableWord, Translation, LearningTracking
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -155,13 +155,15 @@ def words_generate(request, book_id):
     unique_word_count = len(fdist)
 
     # List of all unique words and their frequencies
-    # List of tuples of the form ('word', frequency), ordered by most frequent first
+    # List of tuples of the form ('word', frequency), ordered by most frequent words first
     common_words = fdist.most_common(unique_word_count)
 
     # Keep a maximum amount of tuples for words which meet a minimum frequency
     MIN_FREQUENCY = 3
     MAX_COMMON_WORDS = 50
-    common_words = list(filter(lambda f: f[1] >= MIN_FREQUENCY, common_words))[:MAX_COMMON_WORDS]
+    common_words = list(
+        filter(lambda cw: cw[1] >= MIN_FREQUENCY, common_words)
+    )[:MAX_COMMON_WORDS]
 
     context = {
         'book': book,
@@ -221,6 +223,7 @@ def read(request, book_id):
             # Visible word    : t.foreign_word
             # Popover content : t.foreign_word
             replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
+                                f'data-translation-id="{t.id}"'
                                 f'title="{t.translatable_word.english_word}"'
                                 f'data-content="{t.foreign_word}">'
                                 f'<a tabindex="0" class="btn btn-success btn-word" role="button">{t.foreign_word}</a>'
@@ -229,6 +232,7 @@ def read(request, book_id):
             # Visible word    : t.pronunciation
             # Popover content : t.pronunciation AND t.foreign_word
             replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
+                                f'data-translation-id="{t.id}"'
                                 f'title="{t.translatable_word.english_word}"'
                                 f'data-content="{t.pronunciation} <br> {t.foreign_word}">'
                                 f'<a tabindex="0" class="btn btn-success btn-word" role="button">{t.pronunciation}</a>'
@@ -253,3 +257,78 @@ def read(request, book_id):
         'pages': pages
     }
     return render(request, 'read/read.html', context)
+
+@login_required
+def session_tracking(request):
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        translation_id = json_data['translation_id']
+
+        if request.session.get(translation_id, False):
+            # ID tracked: add to count
+            request.session[translation_id] += 1
+        else:
+            # ID not tracked: create variable and set count to 1
+            request.session[translation_id] = 1
+
+        # Print session items
+        # for k, v in request.session.items():
+        #     print(f'{k} : {v}')
+
+        return JsonResponse({"success": True})
+
+    else:
+        return HttpResponseBadRequest('Invalid request method')
+
+@login_required
+def close_book(request, book_id):
+    # Get user's active ForeignLanguage
+    foreign_language = request.user.active_language.foreign_language
+
+    # Get LearningTracking objects for this user in their active language
+    tracking_history = LearningTracking.objects.filter(
+        user = request.user,
+        translation__foreign_language = foreign_language
+    )
+
+    k_list = []
+    for k, v in request.session.items():
+        # Numeric session data: k = Translation ID, v = interaction count
+        # Do not consider non-numeric session data (auth user id, backend and hash)
+        if k.isnumeric():
+            # Attempt to find Translation object
+            translation = Translation.objects.filter(id=k).first()
+            if translation is not None:
+                # Translation found: prepare to make new LearningTracking object
+                # Store key to clear from session when finished
+                k_list.append(k)
+
+                # Attempt to find previous LearningTracking object for this Translation
+                prev = LearningTracking.objects.filter(translation__id=k).last()
+                if prev is None:
+                    # New statistics
+                    read_count = v
+                    test_count = 0
+                    test_correct = 0
+                else:
+                    # Take existing statistics into account
+                    read_count = prev.read_count + v
+                    test_count = prev.test_count
+                    test_correct = prev.test_correct
+                
+                # Create new object
+                LearningTracking.objects.create(
+                    user = request.user,
+                    translation = translation,
+                    # time = automatic (now)
+                    prev = prev,
+                    read_count = read_count,
+                    test_count = test_count,
+                    test_correct = test_correct
+                )
+            
+    # Clear session tracking
+    for k in k_list:
+        del request.session[k]
+
+    return redirect(reverse('read:details', args=[book_id]))

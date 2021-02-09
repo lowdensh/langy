@@ -67,6 +67,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 ROOT_URLCONF = 'langy.urls'
 
 # Redirect to URL after login (Default redirects to /accounts/profile/)
