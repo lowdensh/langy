@@ -1,6 +1,7 @@
 from django.db import models
 from read.models import Book
 from users.models import CustomUser
+import jellyfish
 
 
 class ForeignLanguage(models.Model):
@@ -67,7 +68,7 @@ class TranslatableWord(models.Model):
             return False
         return True
 
-    # Get the Translation for a given ForeignLanguage
+    # Get the Translation for this word in a given ForeignLanguage
     # Returns None if it does not exist
     def translation(self, foreign_language):
         return self.translations.filter(foreign_language = foreign_language).first()
@@ -85,6 +86,30 @@ class Translation(models.Model):
     foreign_word = models.CharField(max_length=50)
     pronunciation = models.CharField(max_length=50, blank=True)
     last_modified = models.DateTimeField(auto_now_add=True)
+
+    # Readable form of foreign_word
+    @property
+    def readable_word(self):
+        if (not self.foreign_language.uses_latin_script
+            and self.pronunciation):
+                return self.pronunciation
+        return self.foreign_word
+    
+    # Similarity measure: Damerau-Levenshtein Distance
+    #   Return the number of insertions, deletions, substitutions and transpositions required
+    #   to get from English to Foreign word
+    @property
+    def dam(self):
+        return jellyfish.damerau_levenshtein_distance(self.translatable_word.english_word, self.readable_word)
+    
+    # Similarity measure: Jaro-Winkler Similarity
+    #   Return a float between 0 and 1 representing the similarity between
+    #   the English and Foreign word
+    #   where 0 means no similarity
+    #   and 1 represents complete similarity
+    @property
+    def jar(self):
+        return jellyfish.jaro_winkler_similarity(self.translatable_word.english_word, self.readable_word)
 
     class Meta:
         ordering = ['foreign_language', 'translatable_word']
@@ -129,25 +154,21 @@ class LearningTracking(models.Model):
     def ftime(self):
         return self.time.strftime("%Y-%m-%d %H:%M:%S")
 
-    # Key for this word's foreign language
+    # Return an int representing the amount of time in seconds since the previous interaction with this word
+    # Return None if there has been no previous interaction
     @property
-    def lang_key(self):
-        return self.translation.foreign_language.key
-
-    # Romanised word
-    @property
-    def word(self):
-        if (not self.translation.foreign_language.uses_latin_script
-            and self.translation.pronunciation):
-                return self.translation.pronunciation
-        return self.translation.foreign_word
+    def delta(self):
+        if self.prev:
+            return int((self.time - self.prev.time).total_seconds())
+        return None
 
     # Proportion of tests where the user has correctly translated this word
+    # Return None if the user has not been tested on this word
     @property
     def p_trans(self):
-        if test_count == 0:
-            return 0
-        return test_correct / test_count
+        if self.test_count != 0:
+            return self.test_correct / self.test_count
+        return None
 
     class Meta:
         # Oldest first
@@ -155,6 +176,6 @@ class LearningTracking(models.Model):
         verbose_name = ' Learning Tracking'
         verbose_name_plural = ' Learning Tracking'
 
-    # Formatted time and romanised word
+    # Formatted time and readable word
     def __str__(self):
-        return f'{self.ftime} ({self.word})'
+        return f'{self.ftime} ({self.translation.readable_word})'
