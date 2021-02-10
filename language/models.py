@@ -155,20 +155,20 @@ class LearningTracking(models.Model):
         return self.time.strftime("%Y-%m-%d %H:%M:%S")
 
     # Return an int representing the amount of time in seconds since the previous interaction with this word
-    # Return None if there has been no previous interaction
+    # Return 0 if there has been no previous interaction
     @property
     def delta(self):
         if self.prev:
             return int((self.time - self.prev.time).total_seconds())
-        return None
+        return 0
 
     # Proportion of tests where the user has correctly translated this word
-    # Return None if the user has not been tested on this word
+    # Return 0 if the user has not been tested on this word
     @property
     def p_trans(self):
         if self.test_count != 0:
             return self.test_correct / self.test_count
-        return None
+        return 0
 
     class Meta:
         # Oldest first
