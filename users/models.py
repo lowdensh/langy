@@ -39,12 +39,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Return None if user has no LearningLanguage for the given English name
     def learning_language(self, english_name):
         return next(
-        (
-            learning_language for learning_language in self.learning_languages.all()
-            if learning_language.foreign_language.english_name==english_name
-        ),
-        None
-    )
+            (
+                learning_language for learning_language in self.learning_languages.all()
+                if learning_language.foreign_language.english_name==english_name
+            ),
+            None
+        )
+    
+    # Get a QuerySet for a user's LearningTracking objects in a given ForeignLanguage
+    def tracking_history(self, foreign_language):
+        return self.learning_tracking.filter(translation__foreign_language = foreign_language)
 
     def __str__(self):
         return f'{self.email} ({self.display_name})'

@@ -285,11 +285,8 @@ def close_book(request, book_id):
     # Get user's active ForeignLanguage
     foreign_language = request.user.active_language.foreign_language
 
-    # Get LearningTracking objects for this user in their active language
-    tracking_history = LearningTracking.objects.filter(
-        user = request.user,
-        translation__foreign_language = foreign_language
-    )
+    # Get user's LearningTracking objects in this language
+    tracking_history = request.user.tracking_history(foreign_language)
 
     k_list = []
     for k, v in request.session.items():
@@ -304,7 +301,7 @@ def close_book(request, book_id):
                 k_list.append(k)
 
                 # Attempt to find previous LearningTracking object for this Translation
-                prev = LearningTracking.objects.filter(translation__id=k).last()
+                prev = tracking_history.filter(translation__id=k).last()
                 if prev is None:
                     # New statistics
                     read_count = v
