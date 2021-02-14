@@ -77,7 +77,8 @@ class Book(models.Model):
     # Returns a list of Translations for TranslatableWords used by this Book for a given ForeignLanguage
     def available_translations(self, foreign_language):
         return [
-            tw.translation(foreign_language) for tw in self.translatable_words.all()
+            tw.translation(foreign_language)
+            for tw in self.translatable_words.all()
             if tw.translation(foreign_language) is not None
         ]
 
