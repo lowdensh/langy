@@ -69,7 +69,9 @@ def translate_english_words(request, key):
         pronunciations = []
         for translation in translations:
             foreign_words.append(translation.text.lower())
-            pronunciations.append(translation.pronunciation.lower())
+            p = translation.pronunciation
+            if p is not None: p = p.lower()
+            pronunciations.append(p)
 
         # For ForeignLanguages not using Latin script, pronunciations should be enabled and stored
         foreign_language = ForeignLanguage.objects.get(key=key)
