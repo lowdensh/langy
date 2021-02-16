@@ -23,7 +23,7 @@
                 <span class="list-group-item active">
                     Profile
                 </span>
-                <a class="list-group-item" href="{% url 'users:select_a_language' %}">
+                <a class="list-group-item" href="{% url 'language:select' %}">
                     Languages
                 </a>
             </div>
@@ -64,7 +64,48 @@
 
                                     <!-- Left: Stats -->
                                     <div class="col-md-8 mt-md-0 mt-4 text-justify">
-                                        Started learning on {{ learning_language.date_started.date }}
+                                        <p>Started learning on {{ learning_language.date_started.date }}</p>
+                                        <hr>
+                                        <p>
+                                            {% if learning_language.words_learnt %}
+                                                You have learnt {{ learning_language.words_learnt|length }} word{{ learning_language.words_learnt|length | pluralize:",s" }}:
+                                                <div class="border" style="max-height:300px; overflow:auto;">
+                                                    <table class="table table-sm table-hover mb-0">
+                                                        <!-- Headers -->
+                                                        <thead>
+                                                            <tr>
+                                                                <!-- English word -->
+                                                                <th scope="col">English</th>
+                                                                <!-- Foreign word -->
+                                                                <th scope="col">{{ learning_language.foreign_language.english_name }}</th>
+                                                                <!-- Readable word for non-Latin languages -->
+                                                                {% if learning_language.foreign_language.uses_latin_script is False %}
+                                                                    <th scope="col"></th>
+                                                                {% endif %}
+                                                            </tr>
+                                                        </thead>
+                                                        <!-- Body: one row per Translation -->
+                                                        <tbody>
+                                                            {% for translation in learning_language.words_learnt %}
+                                                                <tr>
+                                                                    <!-- English word -->
+                                                                    <td>{{ translation.translatable_word.english_word }}</td>
+                                                                    <!-- Foreign word -->
+                                                                    <td>{{ translation.foreign_word }}</td>
+                                                                    <!-- Readable word for non-Latin languages -->
+                                                                    {% if learning_language.foreign_language.uses_latin_script is False %}
+                                                                        <td>{{ translation.pronunciation }}</th>
+                                                                    {% endif %}
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            {% else %}
+                                                You haven't learnt any words in {{ learning_language.foreign_language.english_name }} yet.
+                                            {% endif %}
+                                        </p>
                                     </div>
 
                                     <!-- Right: Image, name, action buttons -->
@@ -167,10 +208,14 @@
 
 {% block scripts %}
 <script>
+    // Confirmation deletion modal is reused for all LearningLanguage Delete buttons
+
+    // Use modal's caller-id attribute to reference the specific Delete button with the required href
     $(document).on('click', '.btn-delete-confirm', function () {
         $("#confirmDeleteModal").attr("caller-id", $(this).attr("id"));
     })
     
+    // Redirect user to delete_learning_language view for the specific LearningLanguage
     $(document).on('click', '#btn-delete', function () {
         var caller = $("#btn-delete").closest(".modal").attr("caller-id");
         window.location = $("#".concat(caller)).attr("href");

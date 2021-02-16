@@ -41,18 +41,26 @@
             <!-- Main Links -->
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="{% url 'read:books' %}">Read</a>
+                <a class="nav-item nav-link" href="{% url 'wordtest:info' %}">Test</a>
             </div>
 
-            <!-- User Section -->
+            <!-- User Dropdown -->
             <div class="nav-item dropdown ml-auto">
+                <!-- Dropdown Toggle -->
                 <a class="nav-link dropdown-toggle pl-0" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if user.active_language %}
+                        <img src="{{ user.active_language.foreign_language.flag.url }}" class="mr-2" height="24">
+                    {% endif %}
                     {{ user.display_name }}
                 </a>
+                <!-- Dropdown Items -->
                 <div class="dropdown-menu dropdown-menu-md-right" aria-labelledby="navbarDropdownMenuLink">
                     <span class="dropdown-header"><b>{{ user.email }}</b></span>
+
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'users:profile' user.id %}">Profile</a>
-                    <a class="dropdown-item" href="{% url 'users:select_a_language' %}">Languages</a>
+                    <a class="dropdown-item" href="{% url 'language:select' %}">Languages</a>
+
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                 </div>

@@ -7,9 +7,10 @@ urlpatterns = [
     path('books', views.books, name='books'),
 
     path('<int:book_id>/details', views.details, name='details'),
-    path('<int:book_id>', views.read, name='read'),
+    path('<int:book_id>/start-read', views.start_read, name='start_read'),
+    path('<int:book_id>/<int:session_id>/close-book', views.close_book, name='close_book'),
+    path('<int:book_id>/<int:session_id>', views.read, name='read'),
     path('session-tracking', views.session_tracking, name='session_tracking'),
-    path('<int:book_id>/close-book', views.close_book, name='close_book'),
 
     path('<int:book_id>/pages/manage', views.pages_manage, name='pages_manage'),
     path('<int:book_id>/pages/upload-pdf', views.pages_upload_pdf, name='pages_upload_pdf'),

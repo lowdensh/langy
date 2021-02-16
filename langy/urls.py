@@ -32,6 +32,7 @@ urlpatterns = [
     # My apps
     path('users/', include('users.urls')),
     path('read/', include('read.urls')),
+    path('test/', include('wordtest.urls')),
     path('language/', include('language.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

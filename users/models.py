@@ -23,8 +23,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
 
-    # Get a user's active LearningLanguage
-    # Return None if user has no active LearningLanguage
+    # Returns a LearningLanguage
+    #   which is set as active for the user.
+    #   Returns None if the user has no active LearningLanguage.
     @property
     def active_language(self):
         return next(
@@ -36,8 +37,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             None
         )
 
-    # Get a user's LearningLanguage by its English name
-    # Return None if user has no LearningLanguage for the given English name
+    # Returns a LearningLanguage
+    #   belonging to the user by specifying its English name.
+    #   Returns None if user has no LearningLanguage for the given English name.
     def learning_language(self, english_name):
         return next(
             (
@@ -48,43 +50,41 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             None
         )
     
-    # Returns a QuerySet of LearningTracking objects
-    #   for a user in a given ForeignLanguage.
-    def tracking_history(self, foreign_language):
-        return self.learning_tracking.filter(translation__foreign_language = foreign_language)
-    
     # Returns a list of unique Translation IDs
-    #   for a user's LearningTracking objects in a given ForeignLanguage.
-    def tracking_history_tid(self, foreign_language):
+    #   for the user's LearningTraces in a given ForeignLanguage.
+    def traces_unique_tid(self, foreign_language):
         return [
             t['translation__id']
-            for t in self.tracking_history(foreign_language)
-            .order_by('translation')
-            .values('translation__id')
-            .distinct()
+            for t in self.traces
+                .filter(translation__foreign_language = foreign_language)
+                .order_by('translation')
+                .values('translation__id')
+                .distinct()
         ]
 
-    # Returns a list of LearningTracking objects
-    #   for a user in a given ForeignLanguage.
-    #   LearningTracking objects in the list are unique by Translation.
-    #   Each LearningTracking is the user's most recent interaction with each Translation.
-    def tracking_history_unique(self, foreign_language):
-        tracking_history_unique = []
-        for id in self.tracking_history_tid(foreign_language):
-            # Take the most recent (last) LearningTracking from tracking_history
-            tracking_history_unique.append(
-                self.tracking_history(foreign_language).filter(translation__id = id).last()
+    # Returns a list of LearningTraces
+    #   for the user in a given ForeignLanguage.
+    #   LearningTraces in the list are unique by Translation.
+    #   Each LearningTrace is the user's most recent interaction with each Translation.
+    def traces_unique(self, foreign_language):
+        traces_unique = []
+        for id in self.traces_unique_tid(foreign_language):
+            traces_unique.append(
+                self.traces
+                .filter(translation__foreign_language = foreign_language)
+                .filter(translation__id = id)
+                .last()
             )
-        return tracking_history_unique
+        return traces_unique
     
-    # Returns a list of Translation objects
-    #   for a user in a given ForeignLanguage.
-    #   Objects in the list are unique Translations the user has interacted with at least once.
-    def words_learned(self, foreign_language):
-        words_learned = []
-        for lt in self.tracking_history_unique(foreign_language):
-            words_learned.append(lt.translation)
-        return words_learned
+    # Returns a list of Translations
+    #   for the user in a given ForeignLanguage.
+    #   Translations in the list are unique and the user has interacted with at least once.
+    def words_learnt(self, foreign_language):
+        words_learnt = []
+        for trace in self.traces_unique(foreign_language):
+            words_learnt.append(trace.translation)
+        return words_learnt
 
     def __str__(self):
         return f'{self.email} ({self.display_name})'

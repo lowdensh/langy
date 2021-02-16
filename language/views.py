@@ -9,6 +9,15 @@ import json
 
 
 @login_required
+def select(request):
+    context = {
+        'foreign_languages': ForeignLanguage.objects.all(),
+        'active_language': request.user.active_language
+    }
+    return render(request, 'language/select.html', context)
+
+
+@login_required
 @staff_member_required
 def translation_page(request):
     context = {
@@ -115,7 +124,6 @@ def save_translations(request, key):
                 pronunciation = translation['pronunciation']
 
             # Don't accept empty foreign words
-            # TODO front end validation
             if foreign_word is None or foreign_word.strip() == '':
                 print(f'Skipping creation: invalid foreign word for tw-id {translation["translatable_word_id"]}')
 

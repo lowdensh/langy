@@ -6,7 +6,7 @@ def empty_redirect(request):
     # User is logged in
     if request.user.is_authenticated:
 
-        # No active learning language
+        # No active LearningLanguage
         if request.user.active_language is None:
             return redirect('users:select_a_language')
 

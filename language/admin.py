@@ -1,4 +1,4 @@
-from .models import LearningLanguage, ForeignLanguage, TranslatableWord, Translation, LearningTracking
+from .models import LearningLanguage, ForeignLanguage, TranslatableWord, Translation
 from django.contrib import admin
 
 
@@ -17,7 +17,7 @@ class LearningLanguageAdmin(admin.ModelAdmin):
 @admin.register(ForeignLanguage)
 class ForeignLanguageAdmin(admin.ModelAdmin):
     # Main list
-    list_display = ('key', 'english_name', 'foreign_name', 'note', 'uses_latin_script', 'popularity',)
+    list_display = ('key', 'english_name', 'foreign_name', 'note', 'uses_latin_script', 'duolingo_learners',)
     list_display_links = ('english_name',)
 
     def uses_latin_script(self, instance):
@@ -47,50 +47,3 @@ class TranslationAdmin(admin.ModelAdmin):
 
     # Specific Translation instance
     readonly_fields = ['last_modified',]
-
-
-@admin.register(LearningTracking)
-class LearningTrackingAdmin(admin.ModelAdmin):
-    # Main list
-    list_display = ('uid', 'lang', 'eng', 'frn', 'ftime', 'delta', 'len', 'dam', 'jar', 'read', 'test', 'correct', 'p_trans',)
-    list_display_links = ('ftime',)
-    list_filter = ('user',)
-
-    # Specific Translation instance
-    fieldsets = (
-        ('Tracking', {'fields': ('user', 'translation',)}),
-        ('Interaction', {'fields': ('time', 'prev',)}),
-        ('Statistics', {'fields': ('read_count', 'test_count', 'test_correct',)}),
-    )
-    readonly_fields = ['time',]
-
-    # Additional columns
-    def uid(self, obj):
-        return obj.user.id
-
-    def lang(self, obj):
-        return obj.translation.foreign_language.key
-
-    def eng(self, obj):
-        return obj.translation.translatable_word.english_word
-
-    def frn(self, obj):
-        return obj.translation.readable_word
-
-    def len(self, obj):
-        return len(obj.translation.readable_word)
-
-    def dam(self, obj):
-        return obj.translation.dam
-
-    def jar(self, obj):
-        return '{:.3f}'.format(obj.translation.jar)
-
-    def read(self, obj):
-        return obj.read_count
-
-    def test(self, obj):
-        return obj.test_count
-
-    def correct(self, obj):
-        return obj.test_correct

@@ -1,13 +1,15 @@
 from .forms import BookPDFForm
 from .models import Book, Page
-from language.models import ForeignLanguage, TranslatableWord, Translation, LearningTracking
+from language.models import ForeignLanguage, TranslatableWord, Translation
+from tracking.models import LangySession, LearningTrace
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from googletrans import Translator
 import json, nltk, pdfplumber, re
-from django.urls import reverse
 nltk.download('stopwords')
 
 
@@ -201,12 +203,26 @@ def words_save(request, book_id):
 
 
 @login_required
-def read(request, book_id):
+def start_read(request, book_id):
     # User must have an active LearningLanguage to be able to read Books
     if request.user.active_language is None:
         return redirect('users:select_a_language')
 
+    session_id = LangySession.objects.create(
+        user = request.user,
+        foreign_language = request.user.active_language.foreign_language,
+        # session_type: default='READ'
+        # start_time: auto_now_add=True
+        # end_time: set when the user closes the Book
+    ).id
+
+    return redirect(reverse('read:read', args=[book_id, session_id]))
+
+
+@login_required
+def read(request, book_id, session_id):
     book = get_object_or_404(Book, pk=book_id)
+    langy_session = get_object_or_404(LangySession, pk=session_id)
 
     # Get the user's active LearningLanguage and appropriate Translations
     foreign_language = request.user.active_language.foreign_language
@@ -254,9 +270,11 @@ def read(request, book_id):
 
     context = {
         'book': book,
+        'langy_session': langy_session,
         'pages': pages
     }
     return render(request, 'read/read.html', context)
+
 
 @login_required
 def session_tracking(request):
@@ -281,13 +299,17 @@ def session_tracking(request):
         return HttpResponseBadRequest('Invalid request method')
 
 @login_required
-def close_book(request, book_id):
-    # Get user's active ForeignLanguage
+def close_book(request, book_id, session_id):
+    # Get, update and save LangySession
+    langy_session = get_object_or_404(LangySession, pk=session_id)
+    langy_session.end_time = timezone.now()
+    langy_session.save()
+
+    # Get user's active ForeignLanguage and LearningTraces
     foreign_language = request.user.active_language.foreign_language
+    traces_unique = request.user.traces_unique(foreign_language)
 
-    # Get user's LearningTracking objects in this language
-    tracking_history = request.user.tracking_history(foreign_language)
-
+    # Create new LearningTraces based on tracked session data from reading
     k_list = []
     for k, v in request.session.items():
         # Numeric session data: k = Translation ID, v = interaction count
@@ -296,12 +318,15 @@ def close_book(request, book_id):
             # Attempt to find Translation object
             translation = Translation.objects.filter(id=k).first()
             if translation is not None:
-                # Translation found: prepare to make new LearningTracking object
+                # Translation found: prepare to make new LearningTrace
                 # Store key to clear from session when finished
                 k_list.append(k)
 
-                # Attempt to find previous LearningTracking object for this Translation
-                prev = tracking_history.filter(translation__id=k).last()
+                # Attempt to find previous LearningTrace object for this Translation
+                prev = (request.user.traces
+                    .filter(translation__foreign_language = foreign_language)
+                    .filter(translation__id=k)
+                    .last())
                 if prev is None:
                     # New statistics
                     read_count = v
@@ -314,11 +339,13 @@ def close_book(request, book_id):
                     test_correct = prev.test_correct
                 
                 # Create new object
-                LearningTracking.objects.create(
+                LearningTrace.objects.create(
+                    session = langy_session,
                     user = request.user,
+                    # Tracing
                     translation = translation,
-                    # time = automatic (now)
                     prev = prev,
+                    # Statistics
                     read_count = read_count,
                     test_count = test_count,
                     test_correct = test_correct

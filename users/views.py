@@ -44,15 +44,6 @@ def profile(request, id):
 
 
 @login_required
-def select_a_language(request):
-    context = {
-        'foreign_languages': ForeignLanguage.objects.all(),
-        'active_language': request.user.active_language
-    }
-    return render(request, 'users/select-a-language.html', context)
-
-
-@login_required
 def set_active_language(request, english_name):
     active_language = request.user.active_language
 

@@ -21,7 +21,7 @@
                 <i class="material-icons">arrow_back</i> Back
             </a>
             {% if book.has_pages %}
-                <a class="btn btn-success btn-lg ml-2" href="{% url 'read:read' book.id %}" role="button">
+                <a class="btn btn-success btn-lg ml-2" href="{% url 'read:start_read' book.id %}" role="button">
                     <i class="material-icons">menu_book</i> Read!
                 </a>
             {% endif %}

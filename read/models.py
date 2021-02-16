@@ -74,7 +74,8 @@ class Book(models.Model):
             return False
         return True
     
-    # Returns a list of Translations for TranslatableWords used by this Book for a given ForeignLanguage
+    # Returns a list of Translations
+    #   for the TranslatableWords used by this Book for a given ForeignLanguage.
     def available_translations(self, foreign_language):
         return [
             tw.translation(foreign_language)
@@ -82,7 +83,8 @@ class Book(models.Model):
             if tw.translation(foreign_language) is not None
         ]
 
-    # Returns an int for the amount of words that can be learned from this Book for a given ForeignLanguage
+    # Returns an int
+    #   for the amount of words that can be learnt from this Book for a given ForeignLanguage.
     def words_to_learn(self, foreign_language):
         return len(self.available_translations)
     
@@ -99,6 +101,8 @@ class Page(models.Model):
     text = models.TextField()
     image = models.ImageField(upload_to='book_page_images', blank=True, null=True)
 
+    # Returns a string
+    #   which is a short snippet of the text at the beginning of this page.
     @property
     def text_snippet(self):
         max_length = 50
