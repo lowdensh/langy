@@ -65,8 +65,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Returns a list of LearningTraces
     #   for the user in a given ForeignLanguage.
     #   LearningTraces in the list are unique by Translation.
-    #   Each LearningTrace is the user's most recent interaction with each Translation.
-    def traces_unique(self, foreign_language):
+    #   Each LearningTrace is the user's most recent (i.e. last) interaction with each Translation.
+    def traces_unique(self, foreign_language, ordering='alphabetical'):
         traces_unique = []
         for id in self.traces_unique_tid(foreign_language):
             traces_unique.append(
@@ -75,7 +75,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
                 .filter(translation__id = id)
                 .last()
             )
-        return traces_unique
+
+        if ordering == 'alphabetical':
+            # Order by LearningTrace.translation.translatable_word.english_word, A to Z
+            return traces_unique
+
+        if ordering == 'oldest':
+            # Order by LearningTrace.time, oldest first
+            return sorted(traces_unique, key=lambda trace: trace.time)
     
     # Returns a list of Translations
     #   for the user in a given ForeignLanguage.
@@ -87,7 +94,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return words_learnt
 
     def __str__(self):
-        return f'{self.email} ({self.display_name})'
+        return f'{self.email}'
 
     class Meta:
         ordering = ['-is_superuser', 'email']

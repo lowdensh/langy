@@ -204,25 +204,25 @@ def words_save(request, book_id):
 
 @login_required
 def start_read(request, book_id):
-    # User must have an active LearningLanguage to be able to read Books
+    # User must have an active LearningLanguage to read a Book
     if request.user.active_language is None:
         return redirect('users:select_a_language')
 
-    session_id = LangySession.objects.create(
+    book = get_object_or_404(Book, pk=book_id)
+    langy_session_id = LangySession.objects.create(
         user = request.user,
         foreign_language = request.user.active_language.foreign_language,
-        # session_type: default='READ'
-        # start_time: auto_now_add=True
-        # end_time: set when the user closes the Book
+        session_type = 'READ',
+        book = book,
     ).id
 
-    return redirect(reverse('read:read', args=[book_id, session_id]))
+    return redirect(reverse('read:read', args=[book_id, langy_session_id]))
 
 
 @login_required
-def read(request, book_id, session_id):
+def read(request, book_id, langy_session_id):
     book = get_object_or_404(Book, pk=book_id)
-    langy_session = get_object_or_404(LangySession, pk=session_id)
+    langy_session = get_object_or_404(LangySession, pk=langy_session_id)
 
     # Get the user's active LearningLanguage and appropriate Translations
     foreign_language = request.user.active_language.foreign_language
@@ -283,13 +283,12 @@ def session_tracking(request):
         translation_id = json_data['translation_id']
 
         if request.session.get(translation_id, False):
-            # ID tracked: add to count
+            # ID tracked: add to interaction count
             request.session[translation_id] += 1
         else:
-            # ID not tracked: create variable and set count to 1
+            # ID not tracked: create variable and set interaction count to 1
             request.session[translation_id] = 1
 
-        # Print session items
         # for k, v in request.session.items():
         #     print(f'{k} : {v}')
 
@@ -299,9 +298,9 @@ def session_tracking(request):
         return HttpResponseBadRequest('Invalid request method')
 
 @login_required
-def close_book(request, book_id, session_id):
+def close_book(request, book_id, langy_session_id):
     # Get, update and save LangySession
-    langy_session = get_object_or_404(LangySession, pk=session_id)
+    langy_session = get_object_or_404(LangySession, pk=langy_session_id)
     langy_session.end_time = timezone.now()
     langy_session.save()
 
@@ -315,7 +314,8 @@ def close_book(request, book_id, session_id):
         # Numeric session data: k = Translation ID, v = interaction count
         # Do not consider non-numeric session data (auth user id, backend and hash)
         if k.isnumeric():
-            # Attempt to find Translation object
+
+            # Find Translation object
             translation = Translation.objects.filter(id=k).first()
             if translation is not None:
                 # Translation found: prepare to make new LearningTrace

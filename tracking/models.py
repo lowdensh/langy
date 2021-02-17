@@ -1,5 +1,6 @@
 from django.db import models
 from language.models import ForeignLanguage, Translation
+from read.models import Book
 from users.models import CustomUser
 
 
@@ -18,6 +19,7 @@ class LangySession(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='sessions')
     foreign_language = models.ForeignKey(to=ForeignLanguage, on_delete=models.CASCADE, related_name='sessions')
     session_type = models.CharField(max_length=4, choices=TYPE_CHOICES, default='READ')
+    book = models.ForeignKey(to=Book, null=True, on_delete=models.CASCADE, related_name='sessions')
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(
         null=True,
@@ -46,7 +48,7 @@ class LangySession(models.Model):
         return format_datetime(self.duration)
 
     def __str__(self):
-        return f'{self.user} : {self.foreign_language.key} : {self.session_type} @ {self.fstart}'
+        return f'{self.user} : ({self.foreign_language.key}) {self.session_type} @ {self.fstart}'
 
     class Meta:
         # Oldest first
@@ -109,5 +111,5 @@ class LearningTrace(models.Model):
         return f'{self.session.user} : {self.translation} @ {self.ftime}'
 
     class Meta:
-        # Oldest first
+        # Oldest first, then alphabetically by English word, a to z
         ordering = ['session__start_time', 'translation__translatable_word__english_word']

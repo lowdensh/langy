@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Word Test | Langy{% endblock %}
+{% block title %}Word Test Info | Langy{% endblock %}
 
 {% block content %}
 
@@ -28,8 +28,8 @@
                     Your task is to <b>translate</b> them into <b>English!</b>
                 </p>
                 <!-- Action button -->
-                <a class="btn btn-success btn-lg mt-3" href="{% url 'wordtest:test' %}" role="button">
-                    <i class="material-icons">spellcheck</i> Begin Test
+                <a class="btn btn-success btn-lg mt-3" href="{% url 'wordtest:start_test' %}" role="button">
+                    <i class="material-icons">spellcheck</i> Start Test
                 </a>
             {% endif %}
         </div>

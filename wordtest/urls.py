@@ -5,5 +5,7 @@ from django.urls import path
 app_name = 'wordtest'
 urlpatterns = [
     path('info', views.info, name='info'),
-    path('test', views.test, name='test'),
+    path('start-test', views.start_test, name='start_test'),
+    path('<int:langy_session_id>/quit-test', views.quit_test, name='quit_test'),
+    path('<int:langy_session_id>', views.test, name='test'),
 ]

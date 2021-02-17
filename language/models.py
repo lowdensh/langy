@@ -118,8 +118,8 @@ class Translation(models.Model):
 
     def __str__(self):
         if self.foreign_language.uses_latin_script:
-            return f'({self.foreign_language}) {self.translatable_word} : {self.foreign_word}'
-        return f'({self.foreign_language}) {self.translatable_word} : {self.foreign_word} : {self.pronunciation}'
+            return f'({self.foreign_language.key}) {self.translatable_word} -> {self.foreign_word}'
+        return f'({self.foreign_language.key}) {self.translatable_word} -> {self.pronunciation} / {self.foreign_word}'
 
     class Meta:
         ordering = ['foreign_language', 'translatable_word']
