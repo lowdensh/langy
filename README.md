@@ -24,7 +24,7 @@
     <img src="static/images/read-desktop.png" alt="Reading a book on a desktop (large screen device).">
 </div>
 <div align="center">
-    <img src="static/images/read-mobile.png" alt="Reading a book on a mobile (small screen device).">
+    <img src="static/images/read-mobile-chinese.png" alt="Reading a book on a mobile (small screen device).">
 </div>
 
 <br>
