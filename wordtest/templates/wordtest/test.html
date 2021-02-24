@@ -2,8 +2,11 @@
 {% block title %}Word Test | Langy{% endblock %}
 {% load static %}
 {% block extrahead %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/read.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mali">
+    <style>
+        #nav-base {
+            display: none;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -29,40 +32,48 @@
         <div class="col-lg-9 col-md-10 col-12 text-center">
 
             <!-- Headers -->
-            <div class="row bg-light border-top border-bottom p-3 justify-content-center">
+            <div class="row headers bg-light border-top border-bottom p-3 justify-content-center">
                 <!-- Foreign word -->
-                <div class="col-5 text-center font-weight-bold">{{ user.active_language.foreign_language }} Word</div>
+                <div class="col-md-5 text-center font-weight-bold">{{ user.active_language.foreign_language }} Word</div>
                 <!-- English translation -->
-                <div class="col-5 text-center font-weight-bold">English Translation</div>
-                <!-- Feedback -->
-                <!-- <div class="col-1">F</div> -->
+                <div class="col-md-5 text-center font-weight-bold">English Translation</div>
             </div>
 
-            <!-- Rows -->
+            <!-- wordtest rows -->
             {% for translation in translations %}
-                <div class="row row-striped border-bottom p-3 justify-content-center">
+                <div data-tid="{{ translation.id }}" class="row wordtest-row bg-light border-bottom p-3 justify-content-center">
                     <!-- Foreign word -->
                     {% if user.active_language.foreign_language.uses_latin_script is False %}
-                        <div class="col-2">{{ translation.foreign_word }}</div>
-                        <div class="col-3">{{ translation.readable_word }}</div>
+                        <div class="col-md-2">{{ translation.foreign_word }}</div>
+                        <div class="col-md-3">{{ translation.readable_word }}</div>
                     {% else %}
-                    <div class="col-5">{{ translation.foreign_word }}</div>
+                    <div class="col-md-5">{{ translation.foreign_word }}</div>
                     {% endif %}
 
-                    <!-- English translation -->
-                    <div class="col-5">
-                        <input type="text" placeholder="type here!"></input>
+                    <!-- User answer for English translation -->
+                    <div class="col-10 col-md-5">
+                        <input class="user-english" type="text" placeholder="type here!"></input>
                     </div>
 
                     <!-- Feedback -->
-                    <!-- <div class="col-1">x</div> -->
+                    <div class="col-12 mt-4 feedback">
+                        <span class="alert p-2 alert-success">
+                            <i class="material-icons">check_circle</i> Correct!
+                        </span>
+                        <span class="alert p-2 alert-danger">
+                            <i class="material-icons">cancel</i> Translation: <b>English</b>
+                        </span>
+                    </div>
                 </div>
             {% endfor %}
 
-            <!-- Action button -->
+            <!-- Action buttons -->
             {% csrf_token %}
-            <a class="btn btn-success btn-lg mt-md-5 mt-4" href="#" role="button">
+            <a class="btn btn-submit btn-success btn-lg mt-md-5 mt-4" role="button">
                 <i class="material-icons">spellcheck</i> Submit Answers
+            </a>
+            <a class="btn btn-finish btn-success btn-lg mt-md-5 mt-4" href="{% url 'wordtest:info' %}" role="button">
+                <i class="material-icons">check</i> Finish Test
             </a>
         </div>
     </div>
@@ -74,5 +85,78 @@
 {% block scripts %}
 <script>
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
+    $(".feedback").hide()
+    $(".btn-finish").hide()
+
+    $(".btn-submit").on("click", function() {
+        var wordtest_rows = $(".wordtest-row")
+
+        // Build list of answers for request
+        var answers = []
+        wordtest_rows.each(function() {
+            answers.push({
+                translation_id: $(this).attr("data-tid"),
+                user_english: $(this).find(".user-english").val()
+            })
+        })
+
+        console.log(answers)
+
+        $.ajax({
+            method: "POST",
+            url: ("{% url 'wordtest:submit_answers' 0 %}").replace(0, "{{ langy_session.id }}"),
+            headers: {"X-CSRFToken": csrftoken},
+            data: JSON.stringify({
+                "answers": answers
+            }),
+            success: function(data, textStatus, jqXHR) {
+                // Scroll to the top of page
+                $("html, body").animate({scrollTop: 0}, 500)
+
+                // Adjust state of elements
+                displayFeedback(data.results)
+                $(".btn-submit").hide()
+                $(".btn-finish").show()
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ": " + errorThrown)
+            }
+        })
+    })
+
+    function displayFeedback(results) {
+        $.each(results, function(index, result) {
+            // Find corresponding wordtest-row for this result
+            wordtest_row = $(`.wordtest-row[data-tid='${result["translation_id"]}']`)
+            wordtest_row.find(":input").prop("disabled", true)
+
+            if (result['typo']) {
+                // Near-correct answer with a typo
+                wordtest_row.find(".feedback").html(`
+                    <span class="alert p-2 alert-success">
+                        <i class="material-icons">check_circle</i> Nearly! <b>${result["true_english"]}</b>
+                    </span>
+                `)
+            } else if (result['correct']) {
+                // Correct answer
+                wordtest_row.find(".feedback").html(`
+                    <span class="alert p-2 alert-success">
+                        <i class="material-icons">check_circle</i> Correct! <b>${result["true_english"]}</b>
+                    </span>
+                `)
+            } else {
+                // Incorrect answer
+                wordtest_row.find(".feedback").html(`
+                    <span class="alert p-2 alert-danger">
+                        <i class="material-icons">cancel</i> Answer: <b>${result["true_english"]}</b>
+                    </span>
+                `)
+            }
+        })
+
+        // Display feedback column
+        $(".feedback").show()
+    }
 </script>
 {% endblock %}

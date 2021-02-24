@@ -304,9 +304,8 @@ def close_book(request, book_id, langy_session_id):
     langy_session.end_time = timezone.now()
     langy_session.save()
 
-    # Get user's active ForeignLanguage and LearningTraces
+    # Get user's active ForeignLanguage
     foreign_language = request.user.active_language.foreign_language
-    traces_unique = request.user.traces_unique(foreign_language)
 
     # Create new LearningTraces based on tracked session data from reading
     k_list = []

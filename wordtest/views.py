@@ -64,13 +64,21 @@ def start_test(request):
 @login_required
 def test(request, langy_session_id):
     langy_session = get_object_or_404(LangySession, pk=langy_session_id)
+    if langy_session.end_time is not None:
+        context = {
+            'num_words': NUM_WORDS,
+            'error_message': 'This test has already been finished.',
+        }
+        return render(request, 'wordtest/info.html', context)
+
+    # Get user's active ForeignLanguage
     foreign_language = request.user.active_language.foreign_language
 
     # Use LearningTrace data to determine which words (Translation objects) to include in a test
     candidate_traces = request.user.traces_unique(foreign_language, ordering='oldest')
 
     # Prepare a total of NUM_WORDS Translations to test the user on
-    # TODO intelligent selection... NAIVE selection here: just take the 7 oldest
+    # TODO intelligent selection. simple selection here: just take the 7 oldest
     translations = [trace.translation for trace in candidate_traces]
     translations = translations[:NUM_WORDS]
 
@@ -82,10 +90,84 @@ def test(request, langy_session_id):
 
 
 @login_required
+def submit_answers(request, langy_session_id):
+    if request.method == 'POST':
+        # Get, update and save LangySession
+        langy_session = get_object_or_404(LangySession, pk=langy_session_id)
+        langy_session.end_time = timezone.now()
+        langy_session.save()
+
+        # Get data from the request
+        json_data = json.loads(request.body)
+        answers = json_data['answers']
+        if (len(answers)==0):
+            return HttpResponseBadRequest('No answers received in request')
+        
+        # Prepare to create a response and to create new LearningTraces
+        response_results = []
+        for answer in answers:
+            translation = get_object_or_404(Translation, pk=answer['translation_id'])
+
+            # Get the correct English word
+            true_english = translation.translatable_word.english_word
+
+            # A boolean. True if the user translated correctly
+            # TODO intelligent comparison, typo tolerance
+            # simple comparison here: must be an exact match
+            correct = true_english == answer['user_english']
+            typo = False
+
+            # Allow missing an 's' on plural words
+            # Some foreign words e.g. Swedish "djur" (animal/animals) are the same for singular/plural
+            # Ideal scenario: use Google Translate to check each answer
+            # Limitation: API request rate limiting
+            if (true_english == answer['user_english'] + 's'):
+                correct = True
+                typo = True
+
+            # Add result to list for response
+            response_results.append({
+                "translation_id": answer['translation_id'],
+                "true_english": true_english,
+                "correct": correct,
+                "typo": typo,
+            })
+
+            # Create new LearningTrace
+            # Find previous LearningTrace object for this Translation. Should always exist for tested Translations
+            prev = (request.user.traces
+                .filter(translation=translation)
+                .filter(translation__foreign_language = request.user.active_language.foreign_language)
+                .last())
+            if prev is None:
+                continue  # go to next answer
+
+            LearningTrace.objects.create(
+                session = langy_session,
+                user = request.user,
+                # Tracing
+                translation = translation,
+                prev = prev,
+                # Statistics
+                read_count = prev.read_count,
+                test_count = prev.test_count + 1,
+                test_correct = prev.test_correct + 1 if correct else prev.test_correct,
+            )
+
+        return JsonResponse({
+            'results': response_results
+        })
+
+    else:
+        return HttpResponseBadRequest('Invalid request method')
+
+
+@login_required
 def quit_test(request, langy_session_id):
     # Get, update and save LangySession
     langy_session = get_object_or_404(LangySession, pk=langy_session_id)
-    langy_session.end_time = timezone.now()
-    langy_session.save()
+    if langy_session.end_time is None:
+        langy_session.end_time = timezone.now()
+        langy_session.save()
 
     return redirect(reverse('wordtest:info'))

@@ -125,12 +125,12 @@
 
     // Hide check icon in all card headers
     // This is shown when Translation objects are saved for a particular card
-    $('.header-check').hide()
+    $(".header-check").hide()
 
     // Scroll to the top of a card in the accordion when it is clicked
-    $('.collapse').on('shown.bs.collapse', function() {
-        var card = $(this).closest('.card')
-        $('html, body').animate({
+    $(".collapse").on("shown.bs.collapse", function() {
+        var card = $(this).closest(".card")
+        $("html, body").animate({
             scrollTop: card.offset().top - $("#nav-base").height()*1.5
         }, 500)
     })
