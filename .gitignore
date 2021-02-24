@@ -2,7 +2,7 @@
 .idea/
 .vscode/
 .env
-.code-workspace
+*.code-workspace
 
 # Django
 db.sqlite3
