@@ -101,8 +101,6 @@
             })
         })
 
-        console.log(answers)
-
         $.ajax({
             method: "POST",
             url: ("{% url 'wordtest:submit_answers' 0 %}").replace(0, "{{ langy_session.id }}"),
