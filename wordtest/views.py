@@ -119,8 +119,6 @@ def submit_answers(request, langy_session_id):
 
             # Allow missing an 's' on plural words
             # Some foreign words e.g. Swedish "djur" (animal/animals) are the same for singular/plural
-            # Ideal scenario: use Google Translate to check each answer
-            # Limitation: API request rate limiting
             if (true_english == answer['user_english'] + 's'):
                 correct = True
                 typo = True
@@ -133,14 +131,14 @@ def submit_answers(request, langy_session_id):
                 "typo": typo,
             })
 
-            # Create new LearningTrace
-            # Find previous LearningTrace object for this Translation. Should always exist for tested Translations
+            # Prepare to create a new LearningTrace
+            # Find previous LearningTrace object for this Translation
             prev = (request.user.traces
                 .filter(translation=translation)
                 .filter(translation__foreign_language = request.user.active_language.foreign_language)
                 .last())
             if prev is None:
-                continue  # go to next answer
+                continue  # next answer
 
             LearningTrace.objects.create(
                 session = langy_session,
@@ -149,9 +147,10 @@ def submit_answers(request, langy_session_id):
                 translation = translation,
                 prev = prev,
                 # Statistics
-                read_count = prev.read_count,
-                test_count = prev.test_count + 1,
-                test_correct = prev.test_correct + 1 if correct else prev.test_correct,
+                seen = prev.seen,
+                interacted = prev.interacted,
+                tested = prev.tested + 1,
+                tested_correct = prev.tested_correct + 1 if correct else prev.tested_correct,
             )
 
         return JsonResponse({

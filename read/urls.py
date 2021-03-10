@@ -10,7 +10,6 @@ urlpatterns = [
     path('<int:book_id>/start-read', views.start_read, name='start_read'),
     path('<int:book_id>/<int:langy_session_id>/close-book', views.close_book, name='close_book'),
     path('<int:book_id>/<int:langy_session_id>', views.read, name='read'),
-    path('session-tracking', views.session_tracking, name='session_tracking'),
 
     path('<int:book_id>/pages/manage', views.pages_manage, name='pages_manage'),
     path('<int:book_id>/pages/upload-pdf', views.pages_upload_pdf, name='pages_upload_pdf'),

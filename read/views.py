@@ -277,81 +277,10 @@ def read(request, book_id, langy_session_id):
 
 
 @login_required
-def session_tracking(request):
-    if request.method == 'POST':
-        json_data = json.loads(request.body)
-        translation_id = json_data['translation_id']
-
-        if request.session.get(translation_id, False):
-            # ID tracked: add to interaction count
-            request.session[translation_id] += 1
-        else:
-            # ID not tracked: create variable and set interaction count to 1
-            request.session[translation_id] = 1
-
-        # for k, v in request.session.items():
-        #     print(f'{k} : {v}')
-
-        return JsonResponse({"success": True})
-
-    else:
-        return HttpResponseBadRequest('Invalid request method')
-
-@login_required
 def close_book(request, book_id, langy_session_id):
     # Get, update and save LangySession
     langy_session = get_object_or_404(LangySession, pk=langy_session_id)
     langy_session.end_time = timezone.now()
     langy_session.save()
-
-    # Get user's active ForeignLanguage
-    foreign_language = request.user.active_language.foreign_language
-
-    # Create new LearningTraces based on tracked session data from reading
-    k_list = []
-    for k, v in request.session.items():
-        # Numeric session data: k = Translation ID, v = interaction count
-        # Do not consider non-numeric session data (auth user id, backend and hash)
-        if k.isnumeric():
-
-            # Find Translation object
-            translation = Translation.objects.filter(id=k).first()
-            if translation is not None:
-                # Translation found: prepare to make new LearningTrace
-                # Store key to clear from session when finished
-                k_list.append(k)
-
-                # Attempt to find previous LearningTrace object for this Translation
-                prev = (request.user.traces
-                    .filter(translation__foreign_language = foreign_language)
-                    .filter(translation__id=k)
-                    .last())
-                if prev is None:
-                    # New statistics
-                    read_count = v
-                    test_count = 0
-                    test_correct = 0
-                else:
-                    # Take existing statistics into account
-                    read_count = prev.read_count + v
-                    test_count = prev.test_count
-                    test_correct = prev.test_correct
-                
-                # Create new object
-                LearningTrace.objects.create(
-                    session = langy_session,
-                    user = request.user,
-                    # Tracing
-                    translation = translation,
-                    prev = prev,
-                    # Statistics
-                    read_count = read_count,
-                    test_count = test_count,
-                    test_correct = test_correct
-                )
-            
-    # Clear session tracking
-    for k in k_list:
-        del request.session[k]
 
     return redirect(reverse('read:details', args=[book_id]))

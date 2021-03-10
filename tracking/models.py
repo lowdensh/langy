@@ -21,9 +21,7 @@ class LangySession(models.Model):
     session_type = models.CharField(max_length=4, choices=TYPE_CHOICES, default='READ')
     book = models.ForeignKey(to=Book, null=True, on_delete=models.CASCADE, related_name='sessions')
     start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField(
-        null=True,
-        help_text='May be null if the session is not ended in a proper manner.')
+    end_time = models.DateTimeField(null=True)
     
     @property
     def fstart(self):
@@ -62,25 +60,28 @@ class LearningTrace(models.Model):
     # Tracing
     translation = models.ForeignKey(to=Translation, on_delete=models.CASCADE, related_name='traces')
     prev = models.ForeignKey(
-        help_text='Previous interaction <b>(LearningTrace object)</b> the user had with this translation, if any',
+        help_text='User\'s previous <b>LearningTrace</b> for this translation, if any',
         to='self',
         blank=True,
         null=True,
         on_delete=models.CASCADE)
 
     # Statistics
-    read_count = models.PositiveIntegerField(
-        help_text='Total times the user has interacted with this translation during <b>reading</b>',
+    seen = models.PositiveIntegerField(
+        help_text='Amount of times the user has <b>seen</b> this translation during <b>reading</b>',
         default=0)
-    test_count = models.PositiveIntegerField(
-        help_text='Total times the user has interacted with this translation during <b>testing</b>',
+    interacted = models.PositiveIntegerField(
+        help_text='Amount of times the user has <b>interacted</b> with this translation during <b>reading</b>',
         default=0)
-    test_correct = models.PositiveIntegerField(
-        help_text='Total times the user has <b>correctly</b> translated this word during <b>testing</b>',
+    tested = models.PositiveIntegerField(
+        help_text='Amount of times the user has been <b>tested</b> on this translation',
+        default=0)
+    tested_correct = models.PositiveIntegerField(
+        help_text='Amount of times the user has <b>correctly</b> translated this word during <b>testing</b>',
         default=0)
 
     # Returns a datetime
-    #   indicating when the linked session was started.
+    #   indicating when the related LangySession was started.
     @property
     def time(self):
         return self.session.start_time
@@ -90,8 +91,8 @@ class LearningTrace(models.Model):
         return format_datetime(self.time)
 
     # Returns an int
-    #   for the amount of time in seconds since the previous interaction with this Translation.
-    #   Returns 0 if there has been no previous interaction.
+    #   for the amount of time in seconds the user last saw this Translation.
+    #   Returns 0 if the user has never seen it before.
     @property
     def delta(self):
         if self.prev:
@@ -100,16 +101,16 @@ class LearningTrace(models.Model):
 
     # Returns a float
     #   for the proportion of tests where the user has correctly translated this word.
-    #   Returns 0 if the user has not been tested on this word.
+    #   Returns 0 if the user has never been tested on it before.
     @property
     def p_trans(self):
-        if self.test_count != 0:
-            return self.test_correct / self.test_count
+        if self.tested != 0:
+            return self.tested_correct / self.tested
         return 0
 
     def __str__(self):
         return f'{self.session.user} : {self.translation} @ {self.ftime}'
 
     class Meta:
-        # Oldest first, then alphabetically by English word, a to z
+        # Oldest first, then alphabetically by English word, A to Z
         ordering = ['session__start_time', 'translation__translatable_word__english_word']

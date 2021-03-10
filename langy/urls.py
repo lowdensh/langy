@@ -34,5 +34,6 @@ urlpatterns = [
     path('read/', include('read.urls')),
     path('word-test/', include('wordtest.urls')),
     path('language/', include('language.urls')),
+    path('tracking/', include('tracking.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

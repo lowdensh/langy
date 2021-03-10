@@ -69,9 +69,10 @@
 <script>
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
     var current_page = 1
-    var last_page = "{{ book.page_count }}"
+    var last_page = parseInt("{{ book.page_count }}")
+    var pages_read = []
 
-    // Initialise popovers
+    // Initialise TranslatableWord popovers
     $(function () {
         $('[data-toggle="popover"]').popover()
     })
@@ -93,44 +94,6 @@
         $("#pages").height($(window).height() - bars_height)
     }
 
-    // Show a different Page of the Book
-    function changeDisplayedPage() {
-        // Hide all pages
-        $(".page").css("display", "none")
-
-        // Show current page and go to the top
-        $("#" + current_page).show()
-        document.getElementById(current_page).scrollIntoView()
-
-        // Disable buttons based on the current page
-        if (current_page == 1) {
-            $("#btn-page-prev").attr("disabled", true)
-        } else if (current_page == last_page) {
-            $("#btn-page-next").attr("disabled", true)
-        } else {
-            $("#btn-page-prev").attr("disabled", false)
-            $("#btn-page-next").attr("disabled", false)
-        }
-
-        // Update progress bar
-        $(".progress-bar").width((current_page / last_page)*100 + "%")
-        $(".progress-bar").text(current_page + "/" + last_page)
-    }
-
-    function nextPage() {
-        if (current_page < last_page) {
-            current_page++
-            changeDisplayedPage()
-        }
-    }
-
-    function prevPage() {
-        if (current_page > 1) {
-            current_page--
-            changeDisplayedPage()
-        }
-    }
-
     // User wants to change page with buttons or left/right arrow keys
     // Buttons
     $("#btn-page-next").on("click", function() {nextPage()})
@@ -149,27 +112,97 @@
         }
     })
 
+    function nextPage() {
+        if (current_page < last_page) {
+            // Go ahead one page
+            changeDisplayedPage(1)
+        }
+    }
+
+    function prevPage() {
+        if (current_page > 1) {
+            // Go back one page
+            changeDisplayedPage(-1)
+        }
+    }
+
+    // Show a different page of the Book
+    function changeDisplayedPage(change) {
+        if (change == 1) {
+            current_page++
+        }
+        else if (change == -1) {
+            current_page--
+        }
+
+        // Hide all page elements
+        $(".page").css("display", "none")
+
+        // Show current page element and go to the top
+        $("#" + current_page).show()
+        document.getElementById(current_page).scrollIntoView()
+
+        // Disable buttons based on the current page
+        if (current_page == 1) {
+            $("#btn-page-prev").attr("disabled", true)
+        } else if (current_page == last_page) {
+            $("#btn-page-next").attr("disabled", true)
+        } else {
+            $("#btn-page-prev").attr("disabled", false)
+            $("#btn-page-next").attr("disabled", false)
+        }
+
+        // Update progress bar
+        $(".progress-bar").width((current_page / last_page)*100 + "%")
+        $(".progress-bar").text(current_page + "/" + last_page)
+
+        // If this page is new, update pages read and tracked words
+        if (!pages_read.includes(current_page)) {
+            pages_read.push(current_page)
+            trackPageWords()
+        }
+    }
+
+    function trackPageWords() {
+        // Get a list of Translation elements on the current page
+        visible_translations = $(`.page#${current_page} span[data-translation-id]`)
+
+        // Build a list of Translation IDs
+        translation_ids_seen = []
+        visible_translations.each(function() {
+            translation_ids_seen.push($(this).attr("data-translation-id"))
+        })
+
+        // Track Translations as "seen" for the current LangySession
+        add_learning_traces(translation_ids_seen, "seen")
+    }
+
     // User interacted with a TranslatableWord
     $(".btn-word").on("click", function() {
-        // Adjust styling: from button to link appearance
-        // Indicate this has been clicked on before
+        // Adjust styling
         $(this).css({"background":"transparent", "color":"#638D2B", "border":"1px solid transparent"})
 
-        // Track Translation in session
-        var translation_id = $(this).parent().attr("data-translation-id")
+        // Track Translation as "interacted" for the current LangySession
+        tid = $(this).parent().attr("data-translation-id")
+        add_learning_traces([tid], "interacted")
+    })
+
+    function add_learning_traces(translation_ids, mode) {
         $.ajax({
             method: "POST",
-            url: "{% url 'read:session_tracking' %}",
+            url: "{% url 'tracking:add_learning_traces' %}",
             headers: {"X-CSRFToken": csrftoken},
             data: JSON.stringify({
-                    "translation_id": translation_id
+                "langy_session_id": "{{ langy_session.id }}",
+                "translation_ids": translation_ids,
+                "mode": mode
             }),
             success: function(data, textStatus, jqXHR) {},
             error: function(jqXHR, textStatus, errorThrown) {
                 alert(textStatus + ": " + errorThrown)
             }
         })
-    })
+    }
 
 </script>
 {% endblock %}

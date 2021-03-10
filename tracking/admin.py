@@ -26,7 +26,7 @@ class LangySessionAdmin(admin.ModelAdmin):
 @admin.register(LearningTrace)
 class LearningTraceAdmin(admin.ModelAdmin):
     # Main list
-    list_display = ('uid', 'lang', 'eng', 'frn', 'ftime', 'delta', 'len', 'dam', 'jar', 'read', 'test', 'correct', 'p_trans',)
+    list_display = ('uid', 'lang', 'eng', 'frn', 'ftime', 'delta', 'len', 'dam', 'jar', 'seen', 'interacted', 'tested', 'correct', 'p_trans',)
     list_display_links = ('ftime',)
     list_filter = ('session__user', 'translation__foreign_language',)
 
@@ -34,10 +34,10 @@ class LearningTraceAdmin(admin.ModelAdmin):
     fieldsets = (
         ('', {'fields': ('session',)}),
         ('Tracing', {'fields': ('user', 'translation',)}),
-        ('Interaction', {'fields': ('time', 'prev',)}),
-        ('Statistics', {'fields': ('read_count', 'test_count', 'test_correct',)}),
+        ('Interaction', {'fields': ('time', 'prev', 'delta')}),
+        ('Statistics', {'fields': ('seen', 'interacted', 'tested', 'tested_correct',)}),
     )
-    readonly_fields = ['time',]
+    readonly_fields = ['time', 'delta']
 
     # Additional or renamed attributes
     def uid(self, obj):
@@ -61,14 +61,8 @@ class LearningTraceAdmin(admin.ModelAdmin):
     def jar(self, obj):
         return '{:.3f}'.format(obj.translation.jar)
 
-    def read(self, obj):
-        return obj.read_count
-
-    def test(self, obj):
-        return obj.test_count
-
     def correct(self, obj):
-        return obj.test_correct
+        return obj.tested_correct
     
     def p_trans(self, obj):
         return '{:.3f}'.format(obj.p_trans)
