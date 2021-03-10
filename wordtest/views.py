@@ -89,6 +89,9 @@ def test(request, langy_session_id):
 
     # Prepare a total of NUM_WORDS Translations to test the user on
     # TODO intelligent selection. simple selection here: just take the 7 oldest
+        # classify users based on observed p_trans
+        # low p users: only words they have interacted with
+        # hgih p users: include words that have been read only as well
     translations = [trace.translation for trace in candidate_traces]
     translations = translations[:NUM_WORDS]
 

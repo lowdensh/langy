@@ -39,15 +39,9 @@ class LearningLanguage(models.Model):
     is_active = models.BooleanField(default=True)
     date_started = models.DateTimeField(auto_now_add=True)
     
-    # Returns a list of Translations
-    #   for this LearningLanguage's user.
-    #   Translations in the list are unique and the user has interacted with at least once.
     @property
     def words_learnt(self):
-        words_learnt = []
-        for trace in self.user.traces_unique(self.foreign_language):
-            words_learnt.append(trace.translation)
-        return words_learnt
+        return self.user.words_learnt(self.foreign_language)
 
     def __str__(self):
         return f'{self.user} : {self.foreign_language}'

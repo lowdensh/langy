@@ -90,7 +90,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def words_learnt(self, foreign_language):
         words_learnt = []
         for trace in self.traces_unique(foreign_language):
-            words_learnt.append(trace.translation)
+            if trace.interacted > 0:
+                words_learnt.append(trace.translation)
         return words_learnt
 
     def __str__(self):
