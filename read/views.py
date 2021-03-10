@@ -209,6 +209,17 @@ def start_read(request, book_id):
         return redirect('users:select_a_language')
 
     book = get_object_or_404(Book, pk=book_id)
+
+    # End any other active LangySessions for Reading
+    active = LangySession.objects.filter(
+        user = request.user,
+        end_time = None,
+        session_type = 'READ')
+    for s in active:
+        s.end_time = timezone.now()
+        s.save()
+
+    # Start new LangySession
     langy_session_id = LangySession.objects.create(
         user = request.user,
         foreign_language = request.user.active_language.foreign_language,

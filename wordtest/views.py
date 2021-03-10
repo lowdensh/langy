@@ -52,6 +52,16 @@ def start_test(request):
     if len(request.user.words_learnt(foreign_language)) < NUM_WORDS:
         return redirect('wordtest:info')
 
+    # End any other active LangySessions for Testing
+    active = LangySession.objects.filter(
+        user = request.user,
+        end_time = None,
+        session_type = 'TEST')
+    for s in active:
+        s.end_time = timezone.now()
+        s.save()
+
+    # Start new LangySession
     langy_session_id = LangySession.objects.create(
         user = request.user,
         foreign_language = foreign_language,
