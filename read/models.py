@@ -1,5 +1,6 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
+import nltk
 
 
 class Author(models.Model):
@@ -86,7 +87,37 @@ class Book(models.Model):
     # Returns an int
     #   for the amount of words that can be learnt from this Book for a given ForeignLanguage.
     def words_to_learn(self, foreign_language):
-        return len(self.available_translations)
+        return len(self.available_translations(foreign_language))
+
+    # Returns a string
+    #   representing how "difficult" the book is, with respect to the amount of foreign words
+    def difficulty(self, foreign_language):
+        wtl = self.words_to_learn(foreign_language)
+        if wtl <= 11:
+            return 'Easy'
+        elif wtl <= 15:
+            return 'Medium'
+        else:
+            return 'Hard'
+    
+    # Returns an int
+    #   for the number of non-unique English words in the Book's Pages
+    @property
+    def english_word_count(self):
+        counts = [page.english_word_count for page in self.pages.all()]
+        return sum(counts)
+    
+    # Returns a string
+    #   representing how "long" the book is, with respect to the amount of English words in total
+    @property
+    def length(self):
+        ewc = self.english_word_count
+        if ewc <= 700:
+            return 'Short'
+        elif ewc <= 1000:
+            return 'Medium'
+        else:
+            return 'Long'
     
     def __str__(self):
         return self.title
@@ -110,6 +141,14 @@ class Page(models.Model):
             return f'{self.text}'
         else:
             return f'{self.text[0:max_length]}...'
+    
+    # Returns an int
+    #   for the number of non-unique English words in the Page text
+    @property
+    def english_word_count(self):
+        words = nltk.tokenize.word_tokenize(self.text)
+        words = [w for w in words if w.isalnum()]
+        return len(words)
     
     def __str__(self):
         return f'{self.book}, pg. {self.number} ({self.text_snippet})'

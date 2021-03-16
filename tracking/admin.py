@@ -7,7 +7,7 @@ class LangySessionAdmin(admin.ModelAdmin):
     # Main list
     list_display = ('uid', 'lang', 'session_type', 'fstart', 'fend', 'words', 'book',)
     list_display_links = ('session_type',)
-    list_filter = ('user', 'session_type',)
+    list_filter = ('user', 'foreign_language', 'session_type',)
 
     # Specific Session instance
     readonly_fields = ['start_time', 'end_time',]

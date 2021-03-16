@@ -45,8 +45,20 @@
     <!-- Details -->
     <div class="row mt-md-5 mt-4 justify-content-center">
         <div class="col-lg-8 col-md-6 mb-3 text-justify">
-            <h3>Summary</h3>
-            {{ book.summary_text }}
+            <p>
+                <h3>Summary</h3>
+                {{ book.summary_text }}
+            </p>
+            <p>
+                <b>Difficulty:</b>
+                <span class="badge">{{ difficulty }}</span><br>
+                {{ words_to_learn }} {{ user.active_language.foreign_language }} words to learn
+            </p>
+            <p>
+                <b>Length:</b>
+                <span class="badge">{{ book.length }}</span><br>
+                {{ book.english_word_count }} English words in
+            </p>
         </div>
         <div class="col-lg-4 col-md-6 col-10">
             <img src="{{ book.cover.url }}" width="100%">
@@ -55,4 +67,25 @@
 
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // On page load:
+    setBadgeColours()
+
+    // Set background colour of badges for book difficulty and length
+    function setBadgeColours() {
+        bg_easy = ["Easy", "Short"]
+        bg_med = ["Medium"]
+        bg_hard = ["Hard", "Long"]
+
+        $(".badge").each(function() {
+            txt = $(this).text()
+            if (bg_easy.indexOf(txt) != -1) {$(this).addClass("bg-easy")}
+            if (bg_med.indexOf(txt) != -1) {$(this).addClass("bg-med")}
+            if (bg_hard.indexOf(txt) != -1) {$(this).addClass("bg-hard")}
+        })
+    }
+</script>
 {% endblock %}

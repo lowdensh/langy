@@ -34,8 +34,12 @@ def books(request):
 
 @login_required
 def details(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    foreign_language = request.user.active_language.foreign_language
     context = {
-        'book': get_object_or_404(Book, pk=book_id)
+        'book': book,
+        'words_to_learn': book.words_to_learn(foreign_language),
+        'difficulty': book.difficulty(foreign_language),
     }
     return render(request, 'read/details.html', context)
 
