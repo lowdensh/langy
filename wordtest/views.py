@@ -5,7 +5,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-import json
+import jellyfish, json
 
 
 NUM_WORDS = 7
@@ -21,18 +21,18 @@ def info(request):
         
     else:
         foreign_language = request.user.active_language.foreign_language
-        words_learnt = len(request.user.words_learnt(foreign_language))
+        words_seen = len(request.user.words_seen(foreign_language))
 
-        if words_learnt == 0:
+        if words_seen == 0:
             error_message = (
-                f'You haven\'t learnt any words in {foreign_language.english_name} yet!<br>'
-                f'You need to learn at least {NUM_WORDS} words to take a test.')
+                f'You haven\'t seen any words in {foreign_language.english_name} yet!<br>'
+                f'You need to see at least {NUM_WORDS} words to take a test.')
 
-        elif words_learnt < NUM_WORDS:
-            plural = 's' if words_learnt!=1 else ''
+        elif words_seen < NUM_WORDS:
+            plural = 's' if words_seen!=1 else ''
             error_message = (
-                f'You have learnt {words_learnt} word{plural} in {foreign_language.english_name} so far.<br>'
-                f'You need to learn at least {NUM_WORDS} words to take a test. {NUM_WORDS-words_learnt} more to go!')
+                f'You have seen {words_seen} word{plural} in {foreign_language.english_name} so far.<br>'
+                f'You need to see at least {words_seen} words to take a test. {NUM_WORDS-words_seen} more to go!')
 
     context = {
         'num_words': NUM_WORDS,
@@ -45,11 +45,11 @@ def info(request):
 def start_test(request):
     # User must have an active LearningLanguage to take a test
     if request.user.active_language is None:
-        return redirect('users:select_a_language')
+        return redirect('language:select')
 
-    # User must have learnt at least NUM_WORDS to take a test
+    # User must have seen at least NUM_WORDS to take a test
     foreign_language = request.user.active_language.foreign_language
-    if len(request.user.words_learnt(foreign_language)) < NUM_WORDS:
+    if len(request.user.words_seen(foreign_language)) < NUM_WORDS:
         return redirect('wordtest:info')
 
     # End any other active LangySessions for Testing
@@ -89,9 +89,6 @@ def test(request, langy_session_id):
 
     # Prepare a total of NUM_WORDS Translations to test the user on
     # TODO intelligent selection. simple selection here: just take the 7 oldest
-        # classify users based on observed p_trans
-        # low p users: only words they have interacted with
-        # hgih p users: include words that have been read only as well
     translations = [trace.translation for trace in candidate_traces]
     translations = translations[:NUM_WORDS]
 
@@ -116,32 +113,39 @@ def submit_answers(request, langy_session_id):
         if (len(answers)==0):
             return HttpResponseBadRequest('No answers received in request')
         
-        # Prepare to create a response and to create new LearningTraces
+        # Prepare to create a response with results and create new LearningTraces
         response_results = []
         for answer in answers:
             translation = get_object_or_404(Translation, pk=answer['translation_id'])
 
-            # Get the correct English word
-            true_english = translation.translatable_word.english_word
+            # Get the correct English word and user answer
+            # Ignore capitalisation
+            true_english = translation.translatable_word.english_word.lower()
+            user_english = answer['user_english'].lower()
 
-            # A boolean. True if the user translated correctly
-            # TODO intelligent comparison, typo tolerance
-            # simple comparison here: must be an exact match
-            correct = true_english == answer['user_english']
+            # Evaluate user answer
+            correct = true_english == user_english
             typo = False
 
-            # Allow missing an 's' on plural words
+            # Typos: plurals
+            # Allow missing or additional 's'
             # Some foreign words e.g. Swedish "djur" (animal/animals) are the same for singular/plural
-            if (true_english == answer['user_english'] + 's'):
+            if (true_english == user_english+'s' or true_english+'s' == user_english):
+                correct = True
+                typo = True
+            
+            # Typos: typing errors
+            # Allow one accidental character insertion, deletion, substitution or transposition
+            if jellyfish.damerau_levenshtein_distance(true_english, user_english) == 1:
                 correct = True
                 typo = True
 
             # Add result to list for response
             response_results.append({
-                "translation_id": answer['translation_id'],
-                "true_english": true_english,
-                "correct": correct,
-                "typo": typo,
+                'translation_id': answer['translation_id'],
+                'true_english': true_english,
+                'correct': correct,
+                'typo': typo,
             })
 
             # Prepare to create a new LearningTrace
@@ -160,7 +164,7 @@ def submit_answers(request, langy_session_id):
                 translation = translation,
                 prev = prev,
                 # Statistics
-                seen = prev.seen,
+                seen = prev.seen + 1,
                 interacted = prev.interacted,
                 tested = prev.tested + 1,
                 tested_correct = prev.tested_correct + 1 if correct else prev.tested_correct,

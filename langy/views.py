@@ -8,7 +8,7 @@ def empty_redirect(request):
 
         # No active LearningLanguage
         if request.user.active_language is None:
-            return redirect('users:select_a_language')
+            return redirect('language:select')
 
         # Does have an active language :)
         return redirect('read:books')

@@ -68,7 +68,7 @@ class LearningTrace(models.Model):
 
     # Statistics
     seen = models.PositiveIntegerField(
-        help_text='Amount of times the user has <b>seen</b> this translation during <b>reading</b>',
+        help_text='Amount of times the user has <b>seen</b> this translation during <b>reading and testing</b>',
         default=0)
     interacted = models.PositiveIntegerField(
         help_text='Amount of times the user has <b>interacted</b> with this translation during <b>reading</b>',
@@ -91,7 +91,7 @@ class LearningTrace(models.Model):
         return format_datetime(self.time)
 
     # Returns an int
-    #   for the amount of time in seconds the user last saw this Translation.
+    #   for the amount of time in seconds the user last saw this trace's Translation.
     #   Returns 0 if the user has never seen it before.
     @property
     def delta(self):

@@ -40,8 +40,8 @@ class LearningLanguage(models.Model):
     date_started = models.DateTimeField(auto_now_add=True)
     
     @property
-    def words_learnt(self):
-        return self.user.words_learnt(self.foreign_language)
+    def words_seen(self):
+        return self.user.words_seen(self.foreign_language)
 
     def __str__(self):
         return f'{self.user} : {self.foreign_language}'

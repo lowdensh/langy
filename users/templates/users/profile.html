@@ -67,8 +67,8 @@
                                         <p>Started learning on {{ learning_language.date_started.date }}</p>
                                         <hr>
                                         <p>
-                                            {% if learning_language.words_learnt %}
-                                                You have learnt {{ learning_language.words_learnt|length }} word{{ learning_language.words_learnt|length | pluralize:",s" }}:
+                                            {% if learning_language.words_seen %}
+                                                You have seen {{ learning_language.words_seen|length }} word{{ learning_language.words_seen|length | pluralize:",s" }}:
                                                 <div class="border" style="max-height:300px; overflow:auto;">
                                                     <table class="table table-sm table-hover table-striped mb-0">
                                                         <!-- Headers -->
@@ -86,7 +86,7 @@
                                                         </thead>
                                                         <!-- Body: one row per Translation -->
                                                         <tbody>
-                                                            {% for translation in learning_language.words_learnt %}
+                                                            {% for translation in learning_language.words_seen %}
                                                                 <tr>
                                                                     <!-- English word -->
                                                                     <td>{{ translation.translatable_word.english_word }}</td>
@@ -162,7 +162,7 @@
                         <br>
                         When you are, your progress will be shown here.
                         <br>
-                        <a class="btn btn-success btn-lg mt-3" href="{% url 'users:select_a_language' %}">
+                        <a class="btn btn-success btn-lg mt-3" href="{% url 'language:select' %}">
                             Select a Language
                         </a>
                     {% else %}

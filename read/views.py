@@ -206,7 +206,7 @@ def words_save(request, book_id):
 def start_read(request, book_id):
     # User must have an active LearningLanguage to read a Book
     if request.user.active_language is None:
-        return redirect('users:select_a_language')
+        return redirect('language:select')
 
     book = get_object_or_404(Book, pk=book_id)
 

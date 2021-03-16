@@ -65,7 +65,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Returns a list of LearningTraces
     #   for the user in a given ForeignLanguage.
     #   LearningTraces in the list are unique by Translation.
-    #   Each LearningTrace is the user's most recent (i.e. last) interaction with each Translation.
+    #   Each LearningTrace corresponds to the last time the user saw the Translation.
     def traces_unique(self, foreign_language, ordering='alphabetical'):
         traces_unique = []
         for id in self.traces_unique_tid(foreign_language):
@@ -86,13 +86,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
     # Returns a list of Translations
     #   for the user in a given ForeignLanguage.
-    #   Translations in the list are unique and the user has interacted with at least once.
-    def words_learnt(self, foreign_language):
-        words_learnt = []
+    #   Translations in the list are unique and the user has seen at least once.
+    def words_seen(self, foreign_language):
+        words_seen = []
         for trace in self.traces_unique(foreign_language):
-            if trace.interacted > 0:
-                words_learnt.append(trace.translation)
-        return words_learnt
+            words_seen.append(trace.translation)
+        return words_seen
 
     def __str__(self):
         return f'{self.email}'
