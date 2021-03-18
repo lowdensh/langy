@@ -92,10 +92,9 @@ class Book(models.Model):
     # Returns a string
     #   representing how "difficult" the book is, with respect to the amount of foreign words
     def difficulty(self, foreign_language):
-        wtl = self.words_to_learn(foreign_language)
-        if wtl <= 11:
+        if self.words_to_learn(foreign_language) <= 11:
             return 'Easy'
-        elif wtl <= 15:
+        elif self.words_to_learn(foreign_language) <= 15:
             return 'Medium'
         else:
             return 'Hard'
@@ -111,10 +110,9 @@ class Book(models.Model):
     #   representing how "long" the book is, with respect to the amount of English words in total
     @property
     def length(self):
-        ewc = self.english_word_count
-        if ewc <= 700:
+        if self.english_word_count <= 700:
             return 'Short'
-        elif ewc <= 1000:
+        elif self.english_word_count <= 1000:
             return 'Medium'
         else:
             return 'Long'

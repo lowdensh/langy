@@ -50,8 +50,16 @@ class LearningLanguage(models.Model):
         ordering = ['user', 'foreign_language']
 
 
+class Synonym(models.Model):
+    english_word = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.english_word
+
+
 class TranslatableWord(models.Model):
     english_word = models.CharField(max_length=50, unique=True)
+    synonyms = models.ManyToManyField(to=Synonym, related_name='translatable_words')
     books = models.ManyToManyField(to=Book, related_name='translatable_words')
 
     @property

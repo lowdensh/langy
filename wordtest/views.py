@@ -118,25 +118,35 @@ def submit_answers(request, langy_session_id):
         for answer in answers:
             translation = get_object_or_404(Translation, pk=answer['translation_id'])
 
-            # Get the correct English word and user answer
-            # Ignore capitalisation
-            true_english = translation.translatable_word.english_word.lower()
+            # Get user answer, ignore capitalisation
             user_english = answer['user_english'].lower()
 
+            # Get correct answer(s)
+            true_english = translation.translatable_word.english_word.lower()
+            synonyms = [syn.english_word for syn in translation.translatable_word.synonyms.all()]
+            if len(synonyms) != 0:
+                # Find the closest word to the user's input
+                max_sim = jellyfish.jaro_winkler_similarity(user_english, true_english)
+                for syn in synonyms:
+                    sim = jellyfish.jaro_winkler_similarity(user_english, syn)
+                    if sim > max_sim:
+                        max_sim = sim
+                        true_english = syn
+
             # Evaluate user answer
-            correct = true_english == user_english
+            correct = user_english == true_english
             typo = False
 
             # Typos: plurals
             # Allow missing or additional 's'
             # Some foreign words e.g. Swedish "djur" (animal/animals) are the same for singular/plural
-            if (true_english == user_english+'s' or true_english+'s' == user_english):
+            if (user_english == true_english+'s' or user_english+'s' == true_english):
                 correct = True
                 typo = True
             
-            # Typos: typing errors
+            # Typos: typing error tolerance
             # Allow one accidental character insertion, deletion, substitution or transposition
-            if jellyfish.damerau_levenshtein_distance(true_english, user_english) == 1:
+            if jellyfish.damerau_levenshtein_distance(user_english, true_english) == 1:
                 correct = True
                 typo = True
 

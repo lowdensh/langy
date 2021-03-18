@@ -1,17 +1,5 @@
-from .models import LearningLanguage, ForeignLanguage, TranslatableWord, Translation
+from .models import ForeignLanguage, LearningLanguage, Synonym, TranslatableWord, Translation
 from django.contrib import admin
-
-
-@admin.register(LearningLanguage)
-class LearningLanguageAdmin(admin.ModelAdmin):
-    # Main list
-    list_display = ('user', 'foreign_language', 'is_active',)
-    list_display_links = ('user', 'foreign_language',)
-    list_filter = ('foreign_language',)
-    ordering = ('user', 'foreign_language',)
-
-    # Specific CustomUser instance
-    readonly_fields = ['date_started',]
 
 
 @admin.register(ForeignLanguage)
@@ -24,6 +12,21 @@ class ForeignLanguageAdmin(admin.ModelAdmin):
         return instance.uses_latin_script
 
     uses_latin_script.boolean=True
+
+
+@admin.register(LearningLanguage)
+class LearningLanguageAdmin(admin.ModelAdmin):
+    # Main list
+    list_display = ('user', 'foreign_language', 'is_active',)
+    list_display_links = ('user', 'foreign_language',)
+    list_filter = ('foreign_language',)
+    ordering = ('user', 'foreign_language',)
+
+    # Specific LearningLanguage instance
+    readonly_fields = ['date_started',]
+
+
+admin.site.register(Synonym)
 
 
 @admin.register(TranslatableWord)
