@@ -35,22 +35,19 @@ class LearningTraceAdmin(admin.ModelAdmin):
         ('', {'fields': ('session',)}),
         ('Tracing', {'fields': ('user', 'translation',)}),
         ('Interaction', {'fields': ('time', 'prev', 'delta')}),
-        ('Statistics', {'fields': ('seen', 'interacted', 'tested', 'tested_correct',)}),
+        ('Statistics', {'fields': ('seen', 'interacted', 'tested', 'correct',)}),
     )
     readonly_fields = ['time', 'delta']
 
-    # Additional or renamed attributes
+    # Additional attributes
     def uid(self, obj):
         return obj.user.id
-
+    
     def lang(self, obj):
         return obj.translation.foreign_language.key
 
     def eng(self, obj):
         return obj.translation.translatable_word.english_word
-
-    def frn(self, obj):
-        return obj.translation.readable_word
 
     def len(self, obj):
         return len(obj.translation.readable_word)
@@ -60,9 +57,6 @@ class LearningTraceAdmin(admin.ModelAdmin):
 
     def jar(self, obj):
         return '{:.3f}'.format(obj.translation.jar)
-
-    def correct(self, obj):
-        return obj.tested_correct
     
     def p_trans(self, obj):
         return '{:.3f}'.format(obj.p_trans)

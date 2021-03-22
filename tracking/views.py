@@ -48,7 +48,7 @@ def add_learning_traces(request):
                 if mode == "seen":              existing.seen += count
                 elif mode == "interacted":      existing.interacted += count
                 elif mode == "tested":          existing.tested += count
-                elif mode == "tested_correct":  existing.tested_correct += count
+                elif mode == "correct":         existing.correct += count
                 existing.save()
                 continue  # next Translation
 
@@ -69,19 +69,19 @@ def add_learning_traces(request):
                 seen = 0
                 interacted = 0
                 tested = 0
-                tested_correct = 0
+                correct = 0
             else:
                 # Take existing statistics into account
                 seen = prev.seen
                 interacted = prev.interacted
                 tested = prev.tested
-                tested_correct = prev.tested_correct
+                correct = prev.correct
             
             # Update appropriate statistic based on tracking mode
             if mode == "seen":              seen += count
             elif mode == "interacted":      interacted += count
             elif mode == "tested":          tested += count
-            elif mode == "tested_correct":  tested_correct += count
+            elif mode == "correct":         correct += count
             
             # Create new LearningTrace object
             LearningTrace.objects.create(
@@ -94,7 +94,7 @@ def add_learning_traces(request):
                 seen = seen,
                 interacted = interacted,
                 tested = tested,
-                tested_correct = tested_correct,
+                correct = correct,
             )
 
         return JsonResponse({"success": True})

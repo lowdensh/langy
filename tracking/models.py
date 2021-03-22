@@ -76,9 +76,15 @@ class LearningTrace(models.Model):
     tested = models.PositiveIntegerField(
         help_text='Amount of times the user has been <b>tested</b> on this translation',
         default=0)
-    tested_correct = models.PositiveIntegerField(
+    correct = models.PositiveIntegerField(
         help_text='Amount of times the user has <b>correctly</b> translated this word during <b>testing</b>',
         default=0)
+    
+    # Returns a string
+    #   of the readable foreign word for the related translation.
+    @property
+    def frn(self):
+        return self.translation.readable_word
 
     # Returns a datetime
     #   indicating when the related LangySession was started.
@@ -105,7 +111,7 @@ class LearningTrace(models.Model):
     @property
     def p_trans(self):
         if self.tested != 0:
-            return self.tested_correct / self.tested
+            return self.correct / self.tested
         return 0
 
     def __str__(self):

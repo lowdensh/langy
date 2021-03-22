@@ -177,7 +177,7 @@ def submit_answers(request, langy_session_id):
                 seen = prev.seen + 1,
                 interacted = prev.interacted,
                 tested = prev.tested + 1,
-                tested_correct = prev.tested_correct + 1 if correct else prev.tested_correct,
+                correct = prev.correct + 1 if correct else prev.correct,
             )
 
         return JsonResponse({
