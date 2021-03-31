@@ -4,7 +4,7 @@ import pandas as pd
 
 
 csv_directory = 'model_data/'
-duolingo_csv = f'{csv_directory}learning_traces_duolingo_13m.csv'
+duolingo_csv = f'{csv_directory}learning_traces_duolingo_subset.csv'
 langy_csv = f'{csv_directory}learning_traces_langy.csv'
 
 
