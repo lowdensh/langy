@@ -1,10 +1,11 @@
 # Langy
 
-<h1 align="center">
+<div align="center">
   <img src="static/images/langy.svg" alt="Langy">
-</h1>
+</div>
 
-<br>
+<br><br>
+
 <p>
     Langy is a reading-focused foreign language learning aid orientated towards young children.
 </p>
@@ -12,7 +13,7 @@
     Reading is an activity that every child knows. It is a necessary skill that is learned at school and at home, not only building on a child's linguistic capability, but also their cognitive and social skills.
 </p>
 <p>
-    Langy aims to enable children to learn a new language in a manner that feels familiar to them. The platform allows users to read a variety of children's books. Some words in the text are translated into the user's learning language - a foreign language of choice - which can be interacted with to show the English translation.
+    Langy aims to enable children to learn vocabulary in a new language in a manner that feels familiar to them. The platform allows users to read a variety of children's books, where some words in the text are translated into the user's learning language - a foreign language of choice - which can be interacted with to show the English translation.
 </p>
 
 <br>
@@ -23,6 +24,7 @@
 <div align="center">
     <img src="static/images/read-desktop.png" alt="Reading a book on a desktop (large screen device).">
 </div>
+<br>
 <p align="center">
     The application is optimised for both desktop and mobile use.
 </p>
