@@ -1,3 +1,9 @@
+"""
+Create a csv of transformed learning traces to use as input to a model.
+Foreign words are transformed into embed features.
+Outliers are removed and data is standardised.
+"""
+
 from django.core.management.base import BaseCommand, CommandError
 from tracking.management.commands._slutil import tprint
 from tracking.management.commands._vocabulary import get_word_to_ix
@@ -22,8 +28,8 @@ embeddings = nn.Embedding(len(word_to_ix), EMBEDDING_DIM)
 
 # Returns a Tensor
 #   for a foreign word embedding.
-#   e.g. 'lernen' : tensor([[ 0.9712,  0.3932, -2.1187, -2.1191, -2.0247]])
-#   An embedding is a numerical representation/encoding of a string.
+#   e.g. 'lernen' : tensor([[ 0.5695, -0.0698, -0.8072,  0.7015, -0.1184]])
+#   An embedding is a numerical encoding of a string.
 #   Each Tensor has EMBEDDING_DIM dimensions, where each item is a float.
 def get_embed(word):
     lookup_tensor = torch.tensor([word_to_ix[word]], dtype=torch.long)
@@ -31,20 +37,45 @@ def get_embed(word):
 
 
 # Normalise a pandas series based on its mean and standard deviation.
-# A mean and std can be optionally provided.
-def standardise(series, series_mean=None, series_std=None):
-    tprint(f'Standardising series: {series.name}')
+# A mean and std can be optionally provided for reproducible results.
+def standardise(series, verbose=False, series_mean=None, series_std=None):
+    if verbose: tprint(f'Standardising series: {series.name}')
 
     if series_mean == None:
         series_mean = series.mean()
     if series_std == None:
         series_std = series.std()
 
-    tprint(f'   mean: {series_mean}')
-    tprint(f'   std: {series_std}')
+    if verbose:
+        tprint(f'   mean: {series_mean}')
+        tprint(f'   std: {series_std}')
 
     series_standardised = (series - series_mean) / series_std
     return series_standardised
+
+
+# Get ith item from Tensor in embed column
+def get_embed_item(row, i):
+    return row['embed'][0][i].item()
+
+
+# Transform foreign words into embed features
+def words_to_embeds(df, verbose=False):
+    # Get embeds for all foreign words
+    if verbose: tprint('getting embeds for foreign words')
+    df['embed'] = df['frn'].apply(get_embed)
+
+    # Create new feature per embed dimension
+    if verbose: tprint('creating features for word embeds')
+    for i in range(EMBEDDING_DIM):
+        if verbose: tprint(f'embed feature {i+1}/{EMBEDDING_DIM}')
+        df[f'frn_{i}'] = df.apply(get_embed_item, i=i, axis=1)
+    
+    # Drop columns now that foreign words are represented numerically
+    if verbose: tprint('dropping columns')
+    df.drop(['frn', 'embed'], axis=1, inplace=True)
+
+    return df
 
 
 class Command(BaseCommand):
@@ -74,24 +105,7 @@ class Command(BaseCommand):
         # Word Embeddings #
         ###################
         
-        # Prepare to transform foreign words into embed features
-        # Get embeds for all foreign words
-        tprint('getting embeds for foreign words')
-        df['embed'] = df['frn'].apply(get_embed)
-
-        # Get ith item from Tensor in embed column
-        def get_embed_item(row, i):
-            return row['embed'][0][i].item()
-
-        # Create new feature per embed dimension
-        tprint('creating features for word embeds')
-        for i in range(EMBEDDING_DIM):
-            tprint(f'embed feature {i+1}/{EMBEDDING_DIM}')
-            df[f'frn_{i}'] = df.apply(get_embed_item, i=i, axis=1)
-
-        # Drop columns now that foreign words are represented numerically
-        tprint('dropping columns')
-        df.drop(['frn', 'embed'], axis=1, inplace=True)
+        df = words_to_embeds(df, verbose=True)
 
         # Display data
         tprint(f'{df.shape[0]} datapoints:')
@@ -114,13 +128,13 @@ class Command(BaseCommand):
             | (df > (Q3 + 1.5 * IQR))
         ).any(axis=1)]
 
-        # Standardisation for delta and interaction statistics
+        # Standardisation for delta and interaction statistics only
         # Not performed on word embeddings
-        df['delta'] = standardise(df['delta'])
-        df['seen'] = standardise(df['seen'])
-        df['interacted'] = standardise(df['interacted'])
-        df['tested'] = standardise(df['tested'])
-        df['correct'] = standardise(df['correct'])
+        df['delta'] = standardise(df['delta'], verbose=True)
+        df['seen'] = standardise(df['seen'], verbose=True)
+        df['interacted'] = standardise(df['interacted'], verbose=True)
+        df['tested'] = standardise(df['tested'], verbose=True)
+        df['correct'] = standardise(df['correct'], verbose=True)
 
         # Display data
         tprint(f'{df.shape[0]} datapoints:')

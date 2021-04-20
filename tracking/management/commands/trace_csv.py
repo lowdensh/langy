@@ -1,3 +1,5 @@
+"""Create a csv of learning traces from Duolingo or Langy."""
+
 from django.core.management.base import BaseCommand, CommandError
 from tracking.management.commands._slutil import tprint
 from tracking.models import LearningTrace
@@ -20,41 +22,8 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **kwargs):
-        if kwargs['target'] == 'langy': self.create_langy_csv()
         if kwargs['target'] == 'duolingo': self.create_duolingo_csv()
-
-
-    # Create a csv for Langy LearningTrace objects from the database
-    def create_langy_csv(self):
-        output_csv = f'{csv_directory}learning_traces_langy.csv'
-
-        # Get data and create dataframe
-        tprint(f'getting traces and creating dataframe')
-        traces_list = []
-        for t in LearningTrace.objects.all():
-            traces_list.append({
-                'frn': t.frn,
-                'delta': t.delta,
-                'seen': t.seen,
-                'interacted': t.interacted,
-                'tested': t.tested,
-                'correct': t.correct,
-                'p_trans': t.p_trans
-            })
-        df = pd.DataFrame(traces_list)
-
-        # Display data
-        tprint(f'{df.shape[0]} datapoints:')
-        print(df.head())
-
-        # Create csv
-        tprint(f'creating {output_csv}')
-        try:
-            df.to_csv(output_csv, index=False)
-        except:
-            raise CommandError(f'could not create {output_csv}')
-
-        tprint('done.')
+        if kwargs['target'] == 'langy': self.create_langy_csv()
 
 
     # Create a csv for Duolingo learning traces from a csv of existing data
@@ -144,6 +113,39 @@ class Command(BaseCommand):
         #######
         # CSV #
         #######
+
+        # Create csv
+        tprint(f'creating {output_csv}')
+        try:
+            df.to_csv(output_csv, index=False)
+        except:
+            raise CommandError(f'could not create {output_csv}')
+
+        tprint('done.')
+
+
+    # Create a csv for Langy LearningTrace objects from the database
+    def create_langy_csv(self):
+        output_csv = f'{csv_directory}learning_traces_langy.csv'
+
+        # Get data and create dataframe
+        tprint(f'getting traces and creating dataframe')
+        traces_list = []
+        for t in LearningTrace.objects.all():
+            traces_list.append({
+                'frn': t.frn,
+                'delta': t.delta,
+                'seen': t.seen,
+                'interacted': t.interacted,
+                'tested': t.tested,
+                'correct': t.correct,
+                'p_trans': t.p_trans
+            })
+        df = pd.DataFrame(traces_list)
+
+        # Display data
+        tprint(f'{df.shape[0]} datapoints:')
+        print(df.head())
 
         # Create csv
         tprint(f'creating {output_csv}')

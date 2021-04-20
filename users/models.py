@@ -66,23 +66,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     #   for the user in a given ForeignLanguage.
     #   LearningTraces in the list are unique by Translation.
     #   Each LearningTrace corresponds to the last time the user saw the Translation.
-    def traces_unique(self, foreign_language, ordering='alphabetical'):
+    def traces_unique(self, foreign_language):
         traces_unique = []
         for id in self.traces_unique_tid(foreign_language):
             traces_unique.append(
                 self.traces
                 .filter(translation__foreign_language = foreign_language)
                 .filter(translation__id = id)
-                .last()
-            )
-
-        if ordering == 'alphabetical':
-            # Order by LearningTrace.translation.translatable_word.english_word, A to Z
-            return traces_unique
-
-        if ordering == 'oldest':
-            # Order by LearningTrace.time, oldest first
-            return sorted(traces_unique, key=lambda trace: trace.time)
+                .last())
+        return traces_unique
     
     # Returns a list of Translations
     #   for the user in a given ForeignLanguage.

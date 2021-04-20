@@ -1,11 +1,15 @@
-from language.models import Translation
-from tracking.models import LangySession, LearningTrace
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from language.models import Translation
+from model_data.LangyNet import LangyNet
+from tracking.management.commands.input_csv import words_to_embeds, standardise
+from tracking.models import LangySession, LearningTrace
 import jellyfish, json
+import pandas as pd
+import torch
 
 
 NUM_WORDS = 7
@@ -71,6 +75,76 @@ def start_test(request):
     return redirect(reverse('wordtest:test', args=[langy_session_id]))
 
 
+# Use the LangyNet model to predict the probability the user can correctly
+# translate each foreign word in the given list of LearningTraces.
+# Take a list of LearningTraces and return a list of dicts, each including a
+# Translation, delta, and predicted p_trans.
+def traces_to_candidates(learning_traces):
+    # Pick out relevant features and create dataframe
+    input_list = []
+    for t in learning_traces:
+        input_list.append({
+            'frn': t.frn,
+            'delta': t.delta,
+            'seen': t.seen,
+            'interacted': t.interacted,
+            'tested': t.tested,
+            'correct': t.correct
+        })
+    df = pd.DataFrame(input_list)
+
+    # Transform foreign words into embed features
+    df = words_to_embeds(df)
+
+    # Standardisation for delta and interaction statistics only
+    # Not performed on word embeddings
+    # Using same mean and std as model training data
+    df['delta'] = standardise(
+        df['delta'],
+        series_mean=125209.89669589297,
+        series_std=190899.3729304174)
+    df['seen'] = standardise(
+        df['seen'],
+        series_mean=8.58341078256888,
+        series_std=7.16319377895976)
+    df['interacted'] = standardise(
+        df['interacted'],
+        series_mean=8.58341078256888,
+        series_std=7.16319377895976)
+    df['tested'] = standardise(
+        df['tested'],
+        series_mean=8.58341078256888,
+        series_std=7.16319377895976)
+    df['correct'] = standardise(
+        df['correct'],
+        series_mean=7.769209908777974,
+        series_std=6.4754325307512834)
+
+    # Create feature tensor
+    x = torch.tensor(df.values, dtype=torch.float32)
+
+    # Create and load model
+    model = LangyNet(3, 32)
+    model.load_state_dict(torch.load(
+        'model_data/model_state_dict',
+        map_location=torch.device('cpu')))
+    model.eval()
+
+    # Make prediction for p_trans
+    y_hat = model(x)
+
+    # Prepare return
+    candidates = []
+    for i, t in enumerate(learning_traces):
+        candidates.append({
+            'translation': learning_traces[i].translation,
+            'y_hat': y_hat[i].item(),
+            'delta': learning_traces[i].delta
+        })
+
+    return candidates
+
+
 @login_required
 def test(request, langy_session_id):
     langy_session = get_object_or_404(LangySession, pk=langy_session_id)
@@ -85,12 +159,23 @@ def test(request, langy_session_id):
     foreign_language = request.user.active_language.foreign_language
 
     # Use LearningTrace data to determine which words (Translation objects) to include in a test
-    candidate_traces = request.user.traces_unique(foreign_language, ordering='oldest')
+    # Call traces_to_candidates to use the model to make predictions for p_trans
+    candidates = traces_to_candidates(request.user.traces_unique(foreign_language))
+    translations = []  # store Translations to use
 
     # Prepare a total of NUM_WORDS Translations to test the user on
-    # TODO intelligent selection. simple selection here: just take the 7 oldest
-    translations = [trace.translation for trace in candidate_traces]
-    translations = translations[:NUM_WORDS]
+
+    # First half: test on words with a low predicted p_trans
+    num_low_p_trans = NUM_WORDS // 2
+    candidates = sorted(candidates, key=lambda c: c['y_hat'])
+    for i in range(num_low_p_trans):
+        translations.append(candidates.pop(0)['translation'])
+
+    # Second half: test on words recently seen
+    num_low_delta = NUM_WORDS - num_low_p_trans
+    candidates = sorted(candidates, key=lambda c: c['delta'])
+    for i in range(num_low_delta):
+        translations.append(candidates.pop(0)['translation'])
 
     context = {
         'langy_session': langy_session,

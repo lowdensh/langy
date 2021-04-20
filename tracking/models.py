@@ -98,7 +98,7 @@ class LearningTrace(models.Model):
 
     # Returns an int
     #   for the amount of time in seconds the user last saw this trace's Translation.
-    #   Returns 0 if the user has never seen it before.
+    #   Returns 0 if the user has not seen the Translation before this session.
     @property
     def delta(self):
         if self.prev:
