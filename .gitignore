@@ -11,4 +11,4 @@ __pycache__/
 media/
 
 # Other
-model_data/
+model_data/*.csv
