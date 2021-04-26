@@ -19,7 +19,7 @@ class LearningLanguageAdmin(admin.ModelAdmin):
     # Main list
     list_display = ('user', 'foreign_language', 'is_active',)
     list_display_links = ('user', 'foreign_language',)
-    list_filter = ('foreign_language',)
+    list_filter = ('user', 'foreign_language',)
     ordering = ('user', 'foreign_language',)
 
     # Specific LearningLanguage instance

@@ -132,7 +132,7 @@
                                             {% else %}
                                                 <br>
                                                 <a class="btn btn-success btn-lg mt-3"
-                                                    href="{% url 'users:set_active_language' learning_language.foreign_language.english_name %}"
+                                                    href="{% url 'language:set_active_language' learning_language.foreign_language.english_name %}"
                                                     role="button">
                                                     <i class="material-icons">school</i> Learn
                                                 </a>
@@ -142,7 +142,7 @@
                                             <a class="btn btn-delete-confirm btn-danger btn-lg mt-2"
                                                 data-toggle="modal"
                                                 data-target="#confirmDeleteModal"
-                                                href="{% url 'users:delete_learning_language' learning_language.foreign_language.english_name %}"
+                                                href="{% url 'language:delete_learning_language' learning_language.foreign_language.english_name %}"
                                                 id="btn-delete-{{learning_language.foreign_language.english_name}}"
                                                 role="button">
                                                 <i class="material-icons">delete_forever</i> Delete
