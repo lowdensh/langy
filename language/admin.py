@@ -26,7 +26,17 @@ class LearningLanguageAdmin(admin.ModelAdmin):
     readonly_fields = ['date_started',]
 
 
-admin.site.register(Synonym)
+class SynonymInline(admin.TabularInline):
+    model = TranslatableWord.synonyms.through
+
+
+@admin.register(Synonym)
+class SynonymAdmin(admin.ModelAdmin):
+    inlines = [SynonymInline]
+
+
+class BookInline(admin.TabularInline):
+    model = TranslatableWord.books.through
 
 
 @admin.register(TranslatableWord)
@@ -37,8 +47,11 @@ class TranslatableWordAdmin(admin.ModelAdmin):
 
     def is_used(self, instance):
         return instance.is_used
-
     is_used.boolean=True
+
+    # Specific TranslatableWord instance
+    exclude = ('synonyms',)
+    inlines = [SynonymInline, BookInline]
 
 
 @admin.register(Translation)
