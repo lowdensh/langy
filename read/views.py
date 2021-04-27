@@ -249,25 +249,22 @@ def read(request, book_id, langy_session_id):
     # Find and replace whole English words with interactable HTML
     for t in translations:
         pattern = rf'\b{t.translatable_word.english_word}\b'
-
+        
         if foreign_language.uses_latin_script:
-            # Visible word    : t.foreign_word
-            # Popover content : t.foreign_word
-            replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
-                                f'data-translation-id="{t.id}"'
-                                f'title="{t.translatable_word.english_word}"'
-                                f'data-content="{t.foreign_word}">'
-                                f'<a tabindex="0" class="btn btn-success btn-word" role="button">{t.foreign_word}</a>'
-                            '</span>')
+            button_content = t.foreign_word
+            popover_content = t.foreign_word
         else:
-            # Visible word    : t.pronunciation
-            # Popover content : t.pronunciation AND t.foreign_word
-            replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
-                                f'data-translation-id="{t.id}"'
-                                f'title="{t.translatable_word.english_word}"'
-                                f'data-content="{t.pronunciation} <br> {t.foreign_word}">'
-                                f'<a tabindex="0" class="btn btn-success btn-word" role="button">{t.pronunciation}</a>'
-                            '</span>')
+            # Display pronunciation instead of native representation
+            # Ensures users can read the word
+            button_content = t.pronunciation
+            popover_content = f'{t.pronunciation} <br> {t.foreign_word}'
+        
+        replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
+                            f'data-translation-id="{t.id}"'
+                            f'title="{t.translatable_word.english_word}"'
+                            f'data-content="{popover_content}">'
+                            f'<a tabindex="0" class="btn btn-success btn-word" role="button">{button_content}</a>'
+                        '</span>')
         
         # Perform replacement for each Page
         for i, pt in enumerate(page_text_html): 
