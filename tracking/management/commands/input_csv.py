@@ -32,6 +32,12 @@ embeddings = nn.Embedding(len(word_to_ix), EMBEDDING_DIM)
 #   An embedding is a numerical encoding of a string.
 #   Each Tensor has EMBEDDING_DIM dimensions, where each item is a float.
 def get_embed(word):
+    try:
+        ix = word_to_ix[word]
+    except KeyError:
+        # tprint(f'No index for word \'{word}\'')
+        return torch.zeros(1, EMBEDDING_DIM, dtype=torch.long)
+
     lookup_tensor = torch.tensor([word_to_ix[word]], dtype=torch.long)
     return embeddings(lookup_tensor)
 
