@@ -18,20 +18,13 @@ csv_directory = 'model_data/'
 EMBEDDING_DIM = 5     # 5 dimensional word embeddings
 torch.manual_seed(1)  # reproducible results
 
-# Dictionary mapping unique foreign words to indices.
-word_to_ix = get_word_to_ix()
-
-# Stores embeddings for all words.
-# Indices from word_to_ix are used to find the embed Tensor for a particular word.
-embeddings = nn.Embedding(len(word_to_ix), EMBEDDING_DIM)
-
 
 # Returns a Tensor
 #   for a foreign word embedding.
 #   e.g. 'lernen' : tensor([[ 0.5695, -0.0698, -0.8072,  0.7015, -0.1184]])
 #   An embedding is a numerical encoding of a string.
 #   Each Tensor has EMBEDDING_DIM dimensions, where each item is a float.
-def get_embed(word):
+def get_embed(word, word_to_ix, embeddings):
     try:
         ix = word_to_ix[word]
     except KeyError:
@@ -66,10 +59,13 @@ def get_embed_item(row, i):
 
 
 # Transform foreign words into embed features
-def words_to_embeds(df, verbose=False):
+def words_to_embeds(df, word_to_ix, embeddings, verbose=False):
     # Get embeds for all foreign words
     if verbose: tprint('getting embeds for foreign words')
-    df['embed'] = df['frn'].apply(get_embed)
+    df['embed'] = df['frn'].apply(
+        get_embed,
+        word_to_ix=word_to_ix,
+        embeddings=embeddings)
 
     # Create new feature per embed dimension
     if verbose: tprint('creating features for word embeds')
@@ -110,8 +106,16 @@ class Command(BaseCommand):
         ###################
         # Word Embeddings #
         ###################
+
+        # Dictionary mapping unique foreign words to indices
+        word_to_ix = get_word_to_ix()
+
+        # Stores embeddings for all words
+        # Indices from word_to_ix are used to find the embedding for a particular word
+        embeddings = nn.Embedding(len(word_to_ix), EMBEDDING_DIM)
         
-        df = words_to_embeds(df, verbose=True)
+        # Replace foreign words with embeddings
+        df = words_to_embeds(df, word_to_ix, embeddings, verbose=True)
 
         # Display data
         tprint(f'{df.shape[0]} datapoints:')
