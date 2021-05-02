@@ -165,7 +165,7 @@ def save_translations(request, key):
 
         for translation in translations:
             # Prepare Translation object attributes
-            translatable_word = get_object_or_404(TranslatableWord, pk=translation['translatable_word_id'])
+            translatable_word = get_object_or_404(TranslatableWord, pk=int(translation['translatable_word_id']))
             foreign_language = get_object_or_404(ForeignLanguage, key=key)
             foreign_word = translation['foreign_word']
 

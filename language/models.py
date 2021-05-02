@@ -7,9 +7,9 @@ import jellyfish
 class ForeignLanguage(models.Model):
     key = models.CharField(
         max_length=5,
+        unique=True,
         help_text=('ISO-639-1 language codes for supported languages for translation. See <a '
-            'href="https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages">googletrans.LANGUAGES</a>.')
-    )
+            'href="https://py-googletrans.readthedocs.io/en/latest/#googletrans-languages">googletrans.LANGUAGES</a>.'))
     english_name = models.CharField(max_length=20)
     foreign_name = models.CharField(max_length=20)
     note = models.CharField(max_length=20, blank=True)
@@ -19,12 +19,11 @@ class ForeignLanguage(models.Model):
         default=True,
         help_text=('The English language uses Latin script, an Alphabetical <a '
             'href="https://en.wikipedia.org/wiki/Writing_system"> writing system</a>.<br>'
-            'Ensure this field is False for languages which use different scripts (e.g. Russian: Cyrillic) or systems (e.g. Japanese: Kana, Kanji).')
-    )
+            'Ensure this field is False for languages which use different scripts '
+            '(e.g. Russian: Cyrillic) or writing systems (e.g. Japanese: Kana, Kanji).'))
     duolingo_learners = models.PositiveIntegerField(
         help_text=('The amount of learners this language course has on Duolingo. See <a '
-            'href="https://www.duolingo.com/courses">Duolingo Courses</a>.')
-    )
+            'href="https://www.duolingo.com/courses">Duolingo Courses</a>.'))
 
     def __str__(self):
         return self.english_name
@@ -39,6 +38,9 @@ class LearningLanguage(models.Model):
     is_active = models.BooleanField(default=True)
     date_started = models.DateTimeField(auto_now_add=True)
     
+    # Returns a list of Translations
+    #   for the user in a given ForeignLanguage.
+    #   Translations in the list are unique and the user has seen at least once.
     @property
     def words_seen(self):
         return self.user.words_seen(self.foreign_language)
