@@ -35,10 +35,6 @@ class SynonymAdmin(admin.ModelAdmin):
     inlines = [SynonymInline]
 
 
-class BookInline(admin.TabularInline):
-    model = TranslatableWord.books.through
-
-
 @admin.register(TranslatableWord)
 class TranslatableWordAdmin(admin.ModelAdmin):
     # Main list
@@ -51,7 +47,7 @@ class TranslatableWordAdmin(admin.ModelAdmin):
 
     # Specific TranslatableWord instance
     exclude = ('synonyms',)
-    inlines = [SynonymInline, BookInline]
+    inlines = [SynonymInline]
 
 
 @admin.register(Translation)

@@ -24,7 +24,10 @@ def get_vocabulary():
     langy_words = [t.readable_word for t in Translation.objects.all()]
     langy_words = sorted(list(set(langy_words)))  # unique and ordered
 
-    return sorted(np.unique(duolingo_words + langy_words))
+    vocabulary = sorted(np.unique(duolingo_words + langy_words))
+    tprint(f'vocabulary contains {len(vocabulary)} unique foreign words')
+
+    return vocabulary
 
 # Returns a dictionary
 #   mapping unique foreign words to indices.

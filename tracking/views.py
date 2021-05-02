@@ -34,7 +34,6 @@ def add_learning_traces(request):
             if translation is None:
                 continue  # next Translation
 
-
             # Attempt to find existing LearningTrace belonging to this LangySession
             existing = (request.user.traces
                 .filter(session = langy_session)
@@ -45,18 +44,17 @@ def add_learning_traces(request):
             if existing is not None:
                 # No need to create a new LearningTrace for this Translation
                 # Update appropriate statistic based on tracking mode
-                if mode == "seen":              existing.seen += count
-                elif mode == "interacted":      existing.interacted += count
-                elif mode == "tested":          existing.tested += count
-                elif mode == "correct":         existing.correct += count
+                if mode == "seen":         existing.seen += count
+                elif mode == "interacted": existing.interacted += count
+                elif mode == "tested":     existing.tested += count
+                elif mode == "correct":    existing.correct += count
                 existing.save()
                 continue  # next Translation
-
 
             # No LearningTrace for this Translation exists for the current LangySession
             # Prepare to create a new LearningTrace object
 
-            # Attempt to find previous LearningTrace outside of this LangySession
+            # Attempt to find previous LearningTrace, created outside of this LangySession
             prev = (request.user.traces
                 .filter(~Q(session = langy_session))
                 .filter(translation__foreign_language = foreign_language)
@@ -78,10 +76,10 @@ def add_learning_traces(request):
                 correct = prev.correct
             
             # Update appropriate statistic based on tracking mode
-            if mode == "seen":              seen += count
-            elif mode == "interacted":      interacted += count
-            elif mode == "tested":          tested += count
-            elif mode == "correct":         correct += count
+            if mode == "seen":         seen += count
+            elif mode == "interacted": interacted += count
+            elif mode == "tested":     tested += count
+            elif mode == "correct":    correct += count
             
             # Create new LearningTrace object
             LearningTrace.objects.create(

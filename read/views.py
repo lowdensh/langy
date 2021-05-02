@@ -259,12 +259,13 @@ def read(request, book_id, langy_session_id):
             button_content = t.pronunciation
             popover_content = f'{t.pronunciation} <br> {t.foreign_word}'
         
-        replacement = ('<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
-                            f'data-translation-id="{t.id}"'
-                            f'title="{t.translatable_word.english_word}"'
-                            f'data-content="{popover_content}">'
-                            f'<a tabindex="0" class="btn btn-success btn-word" role="button">{button_content}</a>'
-                        '</span>')
+        replacement = (
+            '<span data-toggle="popover" data-placement="top" data-trigger="focus" data-html="true"'
+                f'data-translation-id="{t.id}"'
+                f'title="{t.translatable_word.english_word}"'
+                f'data-content="{popover_content}">'
+                f'<a tabindex="0" class="btn btn-success btn-word" role="button">{button_content}</a>'
+            '</span>')
         
         # Perform replacement for each Page
         for i, pt in enumerate(page_text_html): 

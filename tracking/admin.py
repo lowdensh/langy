@@ -26,9 +26,13 @@ class LangySessionAdmin(admin.ModelAdmin):
 @admin.register(LearningTrace)
 class LearningTraceAdmin(admin.ModelAdmin):
     # Main list
-    list_display = ('uid', 'lang', 'eng', 'frn', 'ftime', 'delta', 'len', 'dam', 'jar', 'seen', 'interacted', 'tested', 'correct', 'p_trans',)
+    list_display = ('uid', 'lang', 'eng', 'frn', 'stype', 'ftime', 'delta', 'seen', 'interacted', 'tested', 'correct', 'p_trans',)
     list_display_links = ('ftime',)
     list_filter = ('session__user', 'translation__foreign_language',)
+    search_fields = (
+        'translation__translatable_word__english_word',
+        'translation__foreign_word',
+        'translation__pronunciation',)
 
     # Specific LearningTrace instance
     fieldsets = (
@@ -49,8 +53,8 @@ class LearningTraceAdmin(admin.ModelAdmin):
     def eng(self, obj):
         return obj.translation.translatable_word.english_word
 
-    def len(self, obj):
-        return len(obj.translation.readable_word)
+    def stype(self, obj):
+        return obj.session.session_type
 
     def dam(self, obj):
         return obj.translation.dam

@@ -98,6 +98,8 @@ class Translation(models.Model):
     def readable_word(self):
         if (not self.foreign_language.uses_latin_script
             and self.pronunciation):
+                # Display pronunciation instead of native representation
+                # Ensures word is readable
                 return self.pronunciation
         return self.foreign_word
     

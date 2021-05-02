@@ -7,9 +7,8 @@ from language.models import Translation
 from model_data.LangyNet import LangyNet
 from tracking.management.commands.input_csv import words_to_embeds, standardise
 from tracking.models import LangySession, LearningTrace
-import jellyfish, json
+import jellyfish, json, torch
 import pandas as pd
-import torch
 
 
 NUM_WORDS = 7
