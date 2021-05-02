@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils import timezone
 from googletrans import Translator
 import json, nltk, pdfplumber, re
-nltk.download('stopwords')
 
 
 @login_required
@@ -143,6 +142,7 @@ def words_manage(request, book_id):
 @login_required
 @staff_member_required
 def words_generate(request, book_id):
+    nltk.download('stopwords')
     book = get_object_or_404(Book, pk=book_id)
 
     # One string containing all book text
