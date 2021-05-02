@@ -5,7 +5,9 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField()
-    display_name = forms.CharField(max_length=20)
+    display_name = forms.CharField(
+        max_length=20,
+        help_text='A publicly displayed name. Does not need to be unique.')
 
     class Meta(UserCreationForm):
         model = CustomUser
@@ -13,7 +15,6 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CustomUserChangeForm(UserChangeForm):
-
     class Meta:
         model = CustomUser
         fields = ('email', 'display_name', 'password',)

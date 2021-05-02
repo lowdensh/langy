@@ -19,15 +19,11 @@ def sign_up(request):
             return redirect('read:books')
 
     # Otherwise, just display the form
-    # This prevents error messages displaying on first form load where the user hasn't submitted anything yet
-    else:
-        form = CustomUserCreationForm()
+    # This prevents error messages displaying on first form load where the
+    # user hasn't submitted anything yet
+    else: form = CustomUserCreationForm()
         
-    context = {
-        'form': form
-    }
-        
-    return render(request, 'users/sign-up.html', context)
+    return render(request, 'users/sign-up.html', {'form': form})
 
 
 @login_required

@@ -9,8 +9,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     display_name = models.CharField(
         max_length=20,
-        help_text='A publicly displayed name. Does not need to be unique, and can be changed whenever you want.'
-    )
+        help_text='A publicly displayed name. Does not need to be unique.')
 
     # Automatic fields
     date_joined = models.DateTimeField(auto_now_add=True)
