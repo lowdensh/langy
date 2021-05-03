@@ -1,4 +1,4 @@
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator
 from django.db import models
 import nltk
 
@@ -130,7 +130,7 @@ class Book(models.Model):
 
 class Page(models.Model):
     book = models.ForeignKey(to=Book, on_delete=models.CASCADE, related_name='pages')
-    number = models.PositiveIntegerField()
+    number = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     text = models.TextField()
     image = models.ImageField(upload_to='book_page_images', blank=True, null=True)
 
