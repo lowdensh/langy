@@ -1,4 +1,3 @@
-from .forms import BookPDFForm
 from .models import Book, Page
 from language.models import ForeignLanguage, TranslatableWord, Translation
 from tracking.models import LangySession, LearningTrace
@@ -34,7 +33,12 @@ def books(request):
 @login_required
 def details(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
+
+    # User must have an active LearningLanguage
+    if request.user.active_language is None:
+        return redirect('language:select')
     foreign_language = request.user.active_language.foreign_language
+
     context = {
         'book': book,
         'words_to_learn': book.words_to_learn(foreign_language),
@@ -47,35 +51,7 @@ def details(request, book_id):
 @staff_member_required
 def pages_manage(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    context = {
-        'book': book,
-        'form':  BookPDFForm(instance=book)
-    }
-    return render(request, 'read/pages-manage.html', context)
-
-
-@login_required
-@staff_member_required
-def pages_upload_pdf(request, book_id):
-    try:
-        book = get_object_or_404(Book, pk=book_id)
-
-        if request.method == 'POST':
-            form = BookPDFForm(request.POST, request.FILES, instance=book)
-            book.pdf.delete()
-            if form.is_valid():
-                form.save()
-
-        form = BookPDFForm(instance=book)  
-
-        context = {
-            'book': book,
-            'form': form
-        }
-        return render(request, 'read/pages-manage.html', context)
-
-    except Exception:
-        return HttpResponseBadRequest('Bad request')
+    return render(request, 'read/pages-manage.html', {'book': book})
 
 
 @login_required
@@ -133,17 +109,18 @@ def pages_save(request, book_id):
 @login_required
 @staff_member_required
 def words_manage(request, book_id):
-    context = {
-        'book': get_object_or_404(Book, pk=book_id)
-    }
+    context = {'book': get_object_or_404(Book, pk=book_id)}
     return render(request, 'read/words-manage.html', context)
 
 
 @login_required
 @staff_member_required
 def words_generate(request, book_id):
-    nltk.download('stopwords')
     book = get_object_or_404(Book, pk=book_id)
+
+    # Must have Pages to generate words from
+    if book.has_pages == False:
+        return redirect(reverse('read:words_manage', args=(book.id,)))
 
     # One string containing all book text
     text = ""
@@ -152,6 +129,7 @@ def words_generate(request, book_id):
 
     # Separate book text into individual words
     # Remove punctuation, stopwords, and convert to lowercase
+    nltk.download('stopwords')
     words = nltk.tokenize.word_tokenize(text)
     words = [w.lower() for w in words if w.isalnum()]
     words = [w for w in words if not w in nltk.corpus.stopwords.words()]
@@ -213,6 +191,10 @@ def start_read(request, book_id):
         return redirect('language:select')
 
     book = get_object_or_404(Book, pk=book_id)
+
+    # Must have Pages to read
+    if book.has_pages == False:
+        return redirect(reverse('read:details', args=(book.id,)))
 
     # End any other active LangySessions for Reading
     active = LangySession.objects.filter(

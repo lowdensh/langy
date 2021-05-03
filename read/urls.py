@@ -12,7 +12,6 @@ urlpatterns = [
     path('<int:book_id>/<int:langy_session_id>', views.read, name='read'),
 
     path('<int:book_id>/pages/manage', views.pages_manage, name='pages_manage'),
-    path('<int:book_id>/pages/upload-pdf', views.pages_upload_pdf, name='pages_upload_pdf'),
     path('<int:book_id>/pages/generate', views.pages_generate, name='pages_generate'),
     path('<int:book_id>/pages/save', views.pages_save, name='pages_save'),
     

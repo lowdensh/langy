@@ -8,6 +8,7 @@ class Author(models.Model):
     surname = models.CharField(max_length=50)
     middle_names = models.CharField(max_length=100, blank=True)
 
+    # Adds a period after single character names
     def format(self, name):
         if len(name) == 1:
             return f'{name}.'
@@ -33,7 +34,10 @@ class Book(models.Model):
     summary = models.TextField(max_length=1000, blank=True)
     cover = models.ImageField(upload_to='book_covers', default='book_covers/default.jpg')
     pdf = models.FileField(
-        'PDF', upload_to='book_pdfs', blank=True, null=True,
+        'PDF',
+        help_text='A PDF file representing the book. This can be blank. Used to generate Pages.',
+        upload_to='book_pdfs',
+        blank=True, null=True,
         validators=[FileExtensionValidator(allowed_extensions=['pdf'])]
     )
 
@@ -126,7 +130,7 @@ class Book(models.Model):
 
 class Page(models.Model):
     book = models.ForeignKey(to=Book, on_delete=models.CASCADE, related_name='pages')
-    number = models.SmallIntegerField()
+    number = models.PositiveIntegerField()
     text = models.TextField()
     image = models.ImageField(upload_to='book_page_images', blank=True, null=True)
 

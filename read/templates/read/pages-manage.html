@@ -22,21 +22,6 @@
     </div>
 
     <div class="row mt-md-5 mt-4">
-        <div class="col">
-            <h3>Upload PDF</h3>
-            {% if book.has_pdf %}
-                <p>Uploading a new PDF will permanently delete and replace the existing one.</p>
-            {% endif %}
-            <form method="POST" action="{% url 'read:pages_upload_pdf' book.id %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.pdf }}
-                <br>
-                <input type="submit" value="Upload" class="btn btn-success btn-lg mt-3">
-            </form>
-        </div>
-    </div>
-
-    <div class="row mt-md-5 mt-4">
         <div class="col text-justify">
             <h3>Generate Pages</h3>
             {% if book.has_pdf %}
