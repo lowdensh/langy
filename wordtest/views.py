@@ -5,13 +5,16 @@ from django.urls import reverse
 from django.utils import timezone
 from language.models import Translation
 from model_data.LangyNet import LangyNet
-from tracking.management.commands.input_csv import words_to_embeds, standardise
+from tracking.management.commands.input_csv import get_word_to_ix, words_to_embeds, standardise
 from tracking.models import LangySession, LearningTrace
 import jellyfish, json, torch
 import pandas as pd
+import torch.nn as nn
 
 
 NUM_WORDS = 7
+EMBEDDING_DIM = 5
+torch.manual_seed(1)
 
 
 @login_required
@@ -92,8 +95,15 @@ def traces_to_candidates(learning_traces):
         })
     df = pd.DataFrame(input_list)
 
-    # Transform foreign words into embed features
-    df = words_to_embeds(df)
+    # Dictionary mapping unique foreign words to indices
+    word_to_ix = get_word_to_ix()
+
+    # Stores embeddings for all words
+    # Indices from word_to_ix are used to find the embedding for a particular word
+    embeddings = nn.Embedding(len(word_to_ix), EMBEDDING_DIM)
+        
+    # Replace foreign words with embeddings
+    df = words_to_embeds(df, word_to_ix, embeddings)
 
     # Standardisation for delta and interaction statistics only
     # Not performed on word embeddings
@@ -123,9 +133,9 @@ def traces_to_candidates(learning_traces):
     x = torch.tensor(df.values, dtype=torch.float32)
 
     # Create and load model
-    model = LangyNet(3, 32)
+    model = LangyNet(3, 16)
     model.load_state_dict(torch.load(
-        'model_data/model_state_dict',
+        'model_data/model_state_dict.pt',
         map_location=torch.device('cpu')))
     model.eval()
 
