@@ -41,17 +41,24 @@
     <div class="row">
         <!-- Arrow page navigation -->
         <div class="col-xs-auto order-first text-left">
-            <button id="btn-page-prev" class="btn btn-success btn-lg px-0 py-2 m-md-3 m-2 ml-md-4 ml-4">
+            <button id="btn-page-prev"
+                class="btn btn-success btn-lg px-3 py-2 m-md-3 m-2 ml-md-4 ml-4">
                 <i class="material-icons arrow">chevron_left</i>
+                <br>
+                Back
             </button>
         </div>
         <div class="col-xs-auto order-last text-right">
-            <button id="btn-page-next" class="btn btn-success btn-lg px-0 py-2 m-md-3 m-2 mr-md-4 mr-4">
+            <button id="btn-page-next"
+                class="btn btn-success btn-lg px-3 py-2 m-md-3 m-2 mr-md-4 mr-4">
                 <i class="material-icons arrow">chevron_right</i>
+                <br>
+                Next
             </button>
         </div>
-        <!-- Word details -->
-        <div class="col my-auto text-center">
+        <!-- Middle Space -->
+        <div class="col my-auto text-center" id="bottom-nav-middle">
+            <h3></h3>
         </div>
     </div>
     <!-- Page progress bar -->
@@ -155,6 +162,13 @@
         // Update progress bar
         $(".progress-bar").width((current_page / last_page)*100 + "%")
         $(".progress-bar").text(current_page + "/" + last_page)
+
+        // If this page is the last one, clearly indicate
+        if (current_page == last_page) {
+            $("#bottom-nav-middle h3").text("Book Complete!")
+        } else {
+            $("#bottom-nav-middle h3").text("")
+        }
 
         // If this page is new, update pages read and tracked words
         if (!pages_read.includes(current_page)) {

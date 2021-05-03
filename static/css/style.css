@@ -119,6 +119,14 @@ a.list-group-item:hover {
     background-color: #F8F9FA;
 }
 
+.navbar-dark .navbar-nav .nav-link,
+.dropdown-toggle {
+    color: #FFF;
+    font-weight: bold;
+    font-size: larger;
+    letter-spacing: 0.05em;
+}
+
 .row-striped:nth-of-type(odd) {
     background-color: #F8F9FA;
 }
